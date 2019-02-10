@@ -1,0 +1,25 @@
+{
+  "name": "npcbot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node index"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thinc5/NPCbot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thinc5/NPCbot/issues"
+  },
+  "homepage": "https://github.com/thinc5/NPCbot#readme",
+  "dependencies": {
+    "@types/node": "^10.12.24",
+    "discord.js": "^11.4.2",
+    "ts-node": "^8.0.2",
+    "typescript": "^3.3.3"
+  }
+}

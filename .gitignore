@@ -1,0 +1,8 @@
+#Private configuration data
+botconfig.json
+
+#Generated js
+*.js
+
+#Dependencies
+node_modules/
