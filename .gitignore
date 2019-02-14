@@ -1,8 +1,5 @@
-#Private configuration data
-botconfig.json
-
-#Generated js
-*.js
+#Private environment variables
+*.env
 
 #Dependencies
 node_modules/

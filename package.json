@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ts-node index"
+    "start": "ts-node Index"
   },
   "repository": {
     "type": "git",
@@ -17,9 +17,13 @@
   },
   "homepage": "https://github.com/thinc5/NPCbot#readme",
   "dependencies": {
+    "@types/dotenv": "^6.1.0",
     "@types/node": "^10.12.24",
+    "@types/twitter": "^1.7.0",
     "discord.js": "^11.4.2",
+    "dotenv": "^6.2.0",
     "ts-node": "^8.0.2",
+    "twitter": "^1.7.1",
     "typescript": "^3.3.3"
   }
 }

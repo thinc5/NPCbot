@@ -1,3 +1,3 @@
-import { app } from "./src/core";
+import { app } from "./src/cores/CoreDiscord";
 
 app.start();
