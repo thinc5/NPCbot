@@ -1,6 +1,6 @@
 import TwitterClient, { ResponseData } from "twitter";
 
-export default class TwitterInstance {
+export default class CoreTwitter {
 
     private instance: TwitterClient;
 
@@ -13,30 +13,30 @@ export default class TwitterInstance {
     }
 
     /**
-     * grabRandomTweet
+     * Get a random tweet from twitter with provided hashtag.
+     * @param object params,
      */
-    public getRandomTweet(cb: (tweet: string) => void): void {
+    public getRandomTweet(hashtag: string, cb: (tweet: string) => void): void {
         const params = {
-            q: "#nodejs, #Nodejs",
+            q: hashtag,
             result_type: "recent",
             lang: "en",
             count: "20",
-            include_entites: "true",
+            include_entities: "true",
             tweet_mode: "extended",
         };
         this.getTweets(params, (data) => {
-            // let i = 0;
-            // while (i < parseInt(params.count, 10)) {
-            //     if (data.statuses[i].text !== undefined) {
-            //         console.log(data.statuses[i].text);
-            //     }
-            //     i++;
-            // }
+            // Pick one out of all tweets received to display by random
             cb(data.statuses[Math.floor(Math.random() * parseInt(params.count, 10))].retweeted_status.full_text);
         });
     }
 
-    public getTweets(params: object, cb: (datas: ResponseData) => void): void {
+    /**
+     * Query tweets from twitter.
+     * @param params object specifying search paramaters
+     * @param cb calback
+     */
+    public getTweets(params: object, cb: (data: ResponseData) => void): void {
         this.instance.get("search/tweets", params, (error, data, response) => {
             cb(data);
         });

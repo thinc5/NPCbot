@@ -1,7 +1,8 @@
+import Core from "../cores/Core";
 /**
- * Base class for potential commands.
+ * Base class for commands.
  */
-export default abstract class Command {
+export default abstract class AbstractCommand {
 
     private call: string;
     private description: string;
@@ -25,6 +26,6 @@ export default abstract class Command {
         return this.usage;
     }
 
-    public abstract called(channelId: number): void;
+    public abstract called(core: Core, channelId: number, args: string[]): void;
 
 }

@@ -1,4 +1,4 @@
-
+import Core from "../cores/Core";
 import AbstractCommand from "./AbstractCommand";
 
 export class RandomTweet extends AbstractCommand {
@@ -7,7 +7,18 @@ export class RandomTweet extends AbstractCommand {
         super(call, description, usage);
     }
 
-    public called(channelId: number): void {
-        throw new Error("Method not implemented.");
+    /**
+     * Reply to user with random tweet.
+     * @param channelId to send response to.
+     * @param args of argument.
+     */
+    public async called(core: Core, channelId: number, args: string[]): Promise<void> {
+        // This command does not accept arguments
+        if (args !== []) {
+            // Send usage
+        }
+        core.getTwitterInstance().getRandomTweet("Node.js", (tweet) => void {
+            // w t f
+        });
     }
 }
