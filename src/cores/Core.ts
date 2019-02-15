@@ -6,6 +6,9 @@ import * as Discord from "discord.js";
 import TwitterInstance from "./TwitterCore";
 import CommandManager from "../managers/CommandManager";
 
+/**
+ * @classdesc The main routine based around the Discord.Client Object.
+ */
 export default class Core {
 
     /**
@@ -39,7 +42,12 @@ export default class Core {
      */
     public async start(): Promise<void> {
         // Log the bot in
-        this.bot.login(process.env.DISCORD_TOKEN);
+        this.bot.login(process.env.DISCORD_TOKEN)
+        .catch(error => {
+            if (error) {
+                console.log("unable to login to discord, check tokens and .env variables.");
+            }
+        });
         // Bot's routine
         this.bot.on("ready", async () => {
             console.log(`${this.bot.user.username} is online!`);
@@ -65,6 +73,14 @@ export default class Core {
         } catch (err) {
             console.log(err.message);
         }
+    }
+    
+    /**
+     * Get bot instance.
+     * @returns bot Discord.Client
+     */
+    public getBot(): Discord.Client {
+        return this.bot;
     }
 
     /**

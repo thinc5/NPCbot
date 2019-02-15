@@ -1,3 +1,5 @@
+import * as Discord from "discord.js"
+
 import Core from "../cores/Core";
 import AbstractCommand from "./AbstractCommand";
 
@@ -12,13 +14,16 @@ export class RandomTweet extends AbstractCommand {
      * @param channelId to send response to.
      * @param args of argument.
      */
-    public async called(core: Core, channelId: number, args: string[]): Promise<void> {
+    public called(core: Core, channelId: number, args: string[]) : void {
         // This command does not accept arguments
         if (args !== []) {
             // Send usage
-        }
-        core.getTwitterInstance().getRandomTweet("Node.js", (tweet) => void {
-            // w t f
+        };
+        const targetChannel: any = core.getBot().channels.get(String(channelId));
+        core.getTwitterInstance().getRandomTweet("Node.js", (tweet) => {
+            if (targetChannel !== undefined) {
+                targetChannel.send(tweet);
+            }
         });
     }
 }

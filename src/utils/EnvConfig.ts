@@ -1,3 +1,8 @@
 import * as Dotenv from "dotenv";
 
-Dotenv.config();
+try {
+    Dotenv.config();
+} catch (err) {
+    console.error(err);
+    throw new Error(err);
+}
