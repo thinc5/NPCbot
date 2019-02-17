@@ -13,9 +13,13 @@ export default class CommandManager extends AbstractManager {
     private commandRegistry: CommandRegistry;
 
     public constructor(core: Core) {
-        super(core, "src/commands/");
+        super(core, "./src/commands/enabled");
         this.commandRegistry = new CommandRegistry();
-        this.loadCommands();
+        this.generateImports().then(() => {
+            this.loadCommands();
+        }).catch((error) => {
+            console.error(error);
+        });
     }
 
     /**
@@ -32,8 +36,8 @@ export default class CommandManager extends AbstractManager {
                 console.log(`Failed to register command as it has already been registered.`)
             }
         }
-        console.log(`Successfully imported ${this.commandRegistry.getRegistrySize()} out of` +
-         `${this.importPaths.length} ${this.importPaths.length === 1 ? "command" : "commands"}.`);
+        console.log(`Successfully imported ${this.commandRegistry.getRegistrySize()} out of ` +
+            `${this.importPaths.length} ${this.importPaths.length === 1 ? "command" : "commands"}.`);
     }
 
     /**

@@ -55,7 +55,6 @@ export default class Core {
                 console.log("unable to login to discord, check tokens and .env variables.");
             }
         });
-        // Bot's routine
         this.bot.on("ready", async () => {
             console.log(`${this.bot.user.username} is online!`);
             await this.initialize();

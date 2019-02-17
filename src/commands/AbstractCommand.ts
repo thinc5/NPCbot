@@ -1,4 +1,5 @@
 import Core from "../cores/Core";
+
 /**
  * Base class for commands.
  */

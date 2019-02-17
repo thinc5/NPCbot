@@ -1,7 +1,7 @@
 import * as Discord from "discord.js"
 
-import Core from "../cores/Core";
-import AbstractCommand from "./AbstractCommand";
+import Core from "../../cores/Core";
+import AbstractCommand from "../AbstractCommand";
 
 export class RandomTweet extends AbstractCommand {
 
