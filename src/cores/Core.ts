@@ -5,6 +5,7 @@ import * as Dotenv from "dotenv";
 import * as Discord from "discord.js";
 import TwitterInstance from "./TwitterCore";
 import CommandManager from "../managers/CommandManager";
+import NPCdb from "../database/NPCdb";
 
 /**
  * @classdesc The main routine based around the Discord.Client Object.
@@ -24,7 +25,12 @@ export default class Core {
     /**
      * CommandManager instance.
      */
-    public commandManager!: CommandManager;
+    private commandManager!: CommandManager;
+
+    /**
+     * Database manager.
+     */
+    private databaseManager: NPCdb;
 
     /**
      * @classdesc Starts bot.
@@ -35,6 +41,7 @@ export default class Core {
         console.log(".env configuration loaded.");
         // Start up discord bot
         this.bot = new Discord.Client();
+        this.databaseManager = new NPCdb();
     }
 
     /**
@@ -43,7 +50,7 @@ export default class Core {
     public async start(): Promise<void> {
         // Log the bot in
         this.bot.login(process.env.DISCORD_TOKEN)
-        .catch(error => {
+        .catch((error) => {
             if (error) {
                 console.log("unable to login to discord, check tokens and .env variables.");
             }
@@ -57,7 +64,7 @@ export default class Core {
         this.bot.on("message", (message: Discord.Message) => {
             // Check message isn't empty
             if (message.content) {
-                this.commandManager.listenForCommand(this, message.content, message.author.id, message);
+                this.commandManager.parseCommand(this, message.content, message.author.id, message);
             }
         });
     }
@@ -74,7 +81,7 @@ export default class Core {
             console.log(err.message);
         }
     }
-    
+
     /**
      * Get bot instance.
      * @returns bot Discord.Client

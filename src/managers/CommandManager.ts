@@ -32,7 +32,8 @@ export default class CommandManager extends AbstractManager {
                 console.log(`Failed to register command as it has already been registered.`)
             }
         }
-        console.log(`Successfully imported ${this.commandRegistry.getRegistrySize()} out of ${this.importPaths.length} ${this.importPaths.length === 1 ? "command" : "commands"}.`);
+        console.log(`Successfully imported ${this.commandRegistry.getRegistrySize()} out of` +
+         `${this.importPaths.length} ${this.importPaths.length === 1 ? "command" : "commands"}.`);
     }
 
     /**
@@ -46,12 +47,12 @@ export default class CommandManager extends AbstractManager {
     /**
      * Filter chat messages for commands and take appropriate actions.
      */
-    public listenForCommand(core: Core, raw: string, userId: string, message: Discord.Message): void {
+    public parseCommand(core: Core, raw: string, userId: string, message: Discord.Message): void {
         // TODO: Link to .env
         const commandPrefix = "%";
         let substrings: string[] = raw.split(" ");
         // Does the line start with the defined prefix?
-        if (substrings[0] != commandPrefix) {
+        if (substrings[0] !== commandPrefix) {
             // Ignore this line
             return;
         }
@@ -62,7 +63,7 @@ export default class CommandManager extends AbstractManager {
         }
         // Try and run command
         try {
-            let command: AbstractCommand | undefined  = this.commandRegistry.getValue(substrings[1]);
+            const command: AbstractCommand | undefined  = this.commandRegistry.getValue(substrings[1]);
             if (command === undefined) {
                 console.log("Command undefined...");
             } else {
