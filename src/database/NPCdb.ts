@@ -1,11 +1,11 @@
-import * as SqLite from "sqlite";
+import * as Sqlite from "sqlite";
 
 /**
  * @classdesc Wrapper class around MySql Database Connection object.
  */
 export default class NPCdb {
 
-    private connection!: SqLite.Database;
+    private connection!: Sqlite.Database;
 
     public constructor() {
         this.loadDb().then(() => {
@@ -15,7 +15,7 @@ export default class NPCdb {
 
     private async loadDb(): Promise<void> {
         return new Promise((resolve, reject) => {
-            const dbPromise = SqLite.open("./test.db", {
+            const dbPromise = Sqlite.open("./test.sqlite", {
                 //      Open r+w    If does not exist create
                 mode: 0x00000002 | 0x00000004,
             });
@@ -41,7 +41,6 @@ export default class NPCdb {
         if (this.connection == undefined) {
             console.log("wtf");
         }
-        console.log(`Reading from: ${this.connection}`);
         this.connection.get(`SELECT * FROM RegisteredChannels`)
         .then((rows) => {
             console.log(rows);

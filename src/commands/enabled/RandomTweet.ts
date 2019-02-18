@@ -1,9 +1,7 @@
-import * as Discord from "discord.js"
-
 import Core from "../../cores/Core";
 import AbstractCommand from "../AbstractCommand";
 
-export class RandomTweet extends AbstractCommand {
+export default class RandomTweet extends AbstractCommand {
 
     public constructor(call: string, description: string, usage: string) {
         super(call, description, usage);
