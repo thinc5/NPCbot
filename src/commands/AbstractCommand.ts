@@ -1,3 +1,5 @@
+import Discord from "discord.js";
+
 import Core from "../cores/Core";
 
 /**
@@ -27,6 +29,6 @@ export default abstract class AbstractCommand {
         return this.usage;
     }
 
-    public abstract called(core: Core, channelId: number, args: string[]): void;
+    public abstract called(core: Core, channel: string, args: string[]): void;
 
 }

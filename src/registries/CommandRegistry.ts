@@ -18,6 +18,7 @@ export default class CommandRegistry extends AbstractRegistry<AbstractCommand> {
      * @returns boolean indicating success.
      */
     public registerCommand(command: AbstractCommand): boolean {
+        console.log(command.getCall());
         return this.addEntry(command.getCall(), command);
     }
 

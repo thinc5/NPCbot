@@ -2,7 +2,7 @@
 import * as Dotenv from "dotenv";
 
 // Dependencies
-import * as Discord from "discord.js";
+import  Discord from "discord.js";
 import TwitterInstance from "./TwitterCore";
 import CommandManager from "../managers/CommandManager";
 import NPCdb from "../database/NPCdb";
