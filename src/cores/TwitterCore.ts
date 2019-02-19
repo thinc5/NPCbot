@@ -17,8 +17,8 @@ export default class CoreTwitter {
 
     /**
      * Query tweets from twitter.
-     * @param params object specifying search paramaters
-     * @param cb calback
+     * @param params object specifying search parameters
+     * @param cb callback
      */
     public getTweets(params: object, cb: (data: ResponseData) => void): void {
         this.instance.get("search/tweets", params, (error, data, response) => {
@@ -45,4 +45,18 @@ export default class CoreTwitter {
             cb(data.statuses[Math.floor(Math.random() * parseInt(params.count, 10))].retweeted_status.full_text);
         });
     }
+
+    /**
+     * Get 
+     */
+    public getTopHashtags(): string[] {
+        let trends: string[] = [];
+        const params = {
+            id: "",
+        };
+        this.instance.get("trends", params, (error, data, response) => {
+            trends = data.trends;
+        });
+    }
+    
 }
