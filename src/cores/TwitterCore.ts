@@ -75,7 +75,7 @@ export default class CoreTwitter {
             try {
                 selectedTweet = data.statuses[Math.floor(Math.random() * parseInt(params.count, 10))].retweeted_status.full_text;
             } catch (err) {
-                console.log("trying again..");
+                console.log("could not get tweet");
             }
             cb(`${selectedTweet}`);
         });

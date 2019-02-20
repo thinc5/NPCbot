@@ -12,7 +12,8 @@ export default class NPCdb {
 
     public constructor() {
         this.loadDb().then(() => {
-            this.queryDB(`SELECT * FROM RegisteredChannels`);
+            //this.readDB();
+            console.log("Database online!");
         });
     }
 
@@ -42,6 +43,23 @@ export default class NPCdb {
                 reject(error);
             });
         })
+    }
+
+    /**
+     * Run a query on database.
+     * @param query SQL query to be "executed".
+     */
+    public async readDB(): Promise<void> {
+        if (this.connection == undefined) {
+            console.error("Database connection closed.");
+        }
+        this.connection.get(`SELECT * FROM RegisteredChannels`)
+        .then((rows) => {
+            console.log(rows);
+        })
+        .catch((error) => {
+            console.error(`Unable to read from database, check it exists. ${error}`);
+        });
     }
 
     /**

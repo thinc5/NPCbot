@@ -35,7 +35,6 @@ export default class CommandManager extends AbstractManager {
      */
     public async loadCommands(): Promise<void> {
         for (const path of this.importPaths) {
-            console.log(Filesystem.accessSync(`${this.PATH}/${path}`));
             const commandClass = await import(`../commands/${path}`)
             .catch((err) => {
                 console.error(err);

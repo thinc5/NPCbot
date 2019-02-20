@@ -6,7 +6,7 @@ import AbstractCommand from "./AbstractCommand";
 export default class LaHashtag extends AbstractCommand {
 
     public constructor() {
-        super("lahashtag", "duh", "usage");
+        super("lahashtags", "duh", "usage");
     }
 
     /**
@@ -15,7 +15,7 @@ export default class LaHashtag extends AbstractCommand {
      * @param args of argument.
      */
     public async called(core: Core, channel: string, args: string[]) : Promise<void> {
-        console.log("called lahastag");
+        console.log("called lahastags");
         const channelTarget: Discord.TextChannel = core.getBot().channels.get(channel) as Discord.TextChannel;
         if (channelTarget !== undefined) {
             if (channelTarget.type == "text") {
