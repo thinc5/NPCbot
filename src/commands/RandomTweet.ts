@@ -1,7 +1,7 @@
 import Discord, { Message } from "discord.js";
 
-import Core from "../../cores/Core";
-import AbstractCommand from "../AbstractCommand";
+import Core from "../cores/Core";
+import AbstractCommand from "./AbstractCommand";
 
 export default class RandomTweet extends AbstractCommand {
 
@@ -14,17 +14,13 @@ export default class RandomTweet extends AbstractCommand {
      * @param channelId to send response to.
      * @param args of argument.
      */
-    public called(core: Core, channel: string, args: string[]) : void {
+    public async called(core: Core, channel: string, args: string[]) : Promise<void> {
         console.log("called randomtweet");
-        // This command does not accept arguments
-        // if (args !== []) {
-        //     // Send usage
-        // };
-        const channelTarget = core.getBot().channels.get(channel);
+        const channelTarget: Discord.TextChannel = core.getBot().channels.get(channel) as Discord.TextChannel;
         if (channelTarget !== undefined) {
-            if (channelTarget.type == "dm" || channelTarget.type == "text") {
-                channelTarget.send("This is not a tweet :thinking:");
-                core.getTwitterInstance().getRandomTweet("Node.js", (tweet) => {
+            if (channelTarget.type == "text") {
+                channelTarget.send("Fetching your tweet! :MonkaSS:");
+                await core.getTwitterInstance().getRandomTweet("Node.js", (tweet) => {
                     if (channel !== undefined) {
                        channelTarget.send(tweet);
                     }
@@ -32,4 +28,5 @@ export default class RandomTweet extends AbstractCommand {
             }
         }
     }
+
 }

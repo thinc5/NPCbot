@@ -22,7 +22,36 @@ export default class CoreTwitter {
      */
     public getTweets(params: object, cb: (data: ResponseData) => void): void {
         this.instance.get("search/tweets", params, (error, data, response) => {
-            cb(data);
+            if (error) {
+                console.log(error);
+            } else {
+                cb(data);
+            }
+        });
+    }
+
+    /**
+     * Get trending hashtags in provided WOID location.
+     */
+    public getTrendingHashtags(params: object, cb: (data: ResponseData) => void): void {
+        this.instance.get("trends", params, (error, data, response) => {
+            console.log(error+" "+data+" "+response);
+        });
+
+    }
+
+    /**
+     * Los Angeles (2442047)
+     * @param hashtag 
+     * @param cb 
+     */
+    public getLaHashtags(): void {
+        const params = {
+            id: 2442047,
+        };
+
+        this.getTrendingHashtags(params, (response) => {
+            console.log(response);
         });
     }
 
@@ -34,15 +63,22 @@ export default class CoreTwitter {
         // Parameters for query
         const params = {
             q: hashtag,
-            result_type: "recent",
+            result_type: "popular",
             lang: "en",
-            count: "20",
+            count: "5",
             include_entities: "true",
             tweet_mode: "extended",
         };
         this.getTweets(params, (data) => {
             // Pick one out of all tweets received to display by random
-            cb(data.statuses[Math.floor(Math.random() * parseInt(params.count, 10))].retweeted_status.full_text);
+            let selectedTweet!: string;
+            try {
+                selectedTweet = data.statuses[Math.floor(Math.random() * parseInt(params.count, 10))].retweeted_status.full_text;
+            } catch (err) {
+                console.log("trying again..");
+            }
+            cb(`${selectedTweet}`);
         });
     }
+
 }

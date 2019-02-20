@@ -16,9 +16,14 @@ export default class CommandManager extends AbstractManager {
     private commandRegistry: CommandRegistry;
 
     public constructor(core: Core) {
-        super(core, "./src/commands/enabled");
+        super(core, "./src/commands");
         this.commandRegistry = new CommandRegistry();
         this.generateImports().then(() => {
+            // Remove AbstractCommand from commands to import.
+            let index = this.importPaths.indexOf("AbstractCommand.ts");
+            if (index !== -1) {
+                this.importPaths.splice(index, 1);
+            }
             this.loadCommands();
         }).catch((error) => {
             console.error(error);
@@ -30,8 +35,14 @@ export default class CommandManager extends AbstractManager {
      */
     public async loadCommands(): Promise<void> {
         for (const path of this.importPaths) {
-            const commandClass = await import(`../commands/enabled/${path}`);
-            if (!commandClass.default) {
+            console.log(Filesystem.accessSync(`${this.PATH}/${path}`));
+            const commandClass = await import(`../commands/${path}`)
+            .catch((err) => {
+                console.error(err);
+            });
+            if (commandClass === undefined) {
+                console.log(`Failed to register command. ${path} could not be imported.`);
+            } else if (!commandClass.default) {
                 console.log(`Failed to register command. ${path} has no default export.`);
             } else if (!(new commandClass.default() instanceof AbstractCommand)) {
                 console.log(`Failed to register command. ${path} exported class is not of type "AbstractCommand".`);
