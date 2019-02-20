@@ -5,20 +5,27 @@ import * as Sqlite from "sqlite";
  */
 export default class NPCdb {
 
+    /**
+     * Database connection.
+     */
     private connection!: Sqlite.Database;
 
     public constructor() {
         this.loadDb().then(() => {
-            this.readDb();
+            this.queryDB(`SELECT * FROM RegisteredChannels`);
         });
     }
 
+    /**
+     * Load database from file or create if it does not exist or cannot be found.
+     */
     private async loadDb(): Promise<void> {
         return new Promise((resolve, reject) => {
-            const dbPromise = Sqlite.open("./test.sqlite", {
-                //      Open r+w    If does not exist create
+            const dbPromise = Sqlite.open(process.env.DB_LOCATION as string, {
+                //     Open r+w    If does not exist create
                 mode: 0x00000002 | 0x00000004,
             });
+            // Resolve promise
             dbPromise.then((db) => {
                 this.connection = db;
                 this.connection.migrate({
@@ -32,16 +39,20 @@ export default class NPCdb {
             })
             .catch((error) => {
                 console.error(`Unable to open database: ${error}`);
-            reject(error);
+                reject(error);
             });
         })
     }
 
-    public async readDb(): Promise<void> {
+    /**
+     * Run a query on database.
+     * @param query SQL query to be "executed".
+     */
+    public async queryDB(query: string): Promise<void> {
         if (this.connection == undefined) {
-            console.log("wtf");
+            console.error("Database connection closed.");
         }
-        this.connection.get(`SELECT * FROM RegisteredChannels`)
+        this.connection.get(query)
         .then((rows) => {
             console.log(rows);
         })
@@ -49,4 +60,15 @@ export default class NPCdb {
             console.error(`Unable to read from database, check it exists. ${error}`);
         });
     }
+
+    /**
+     * Get array of strings indicating channels which NPCbot is registered in.
+     */
+    public async registeredChannels(): Promise<string[]> {
+        return new Promise((resolve, reject) => {
+            this.queryDB(`SELECT * FROM RegisteredChannels WHERE bot_enabled  = "TRUE"`);
+            resolve();
+        });
+    }
+
 }

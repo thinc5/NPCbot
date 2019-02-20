@@ -17,8 +17,8 @@ export default class CoreTwitter {
 
     /**
      * Query tweets from twitter.
-     * @param params object specifying search paramaters
-     * @param cb calback
+     * @param params object specifying search parameters
+     * @param cb callback
      */
     public getTweets(params: object, cb: (data: ResponseData) => void): void {
         this.instance.get("search/tweets", params, (error, data, response) => {
