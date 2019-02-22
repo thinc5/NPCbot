@@ -10,13 +10,23 @@ export default class DBCore {
      */
     private connection!: Sqlite.Database;
 
+    /**
+     * Cache of registered Channels.
+     */
+    private registeredChannels: string[];
+
     public constructor() {
+        this.registeredChannels = [];
         this.loadDb().then(() => {
             console.log("Database Manager connected.");
-            this.readDB();
-            this.getRegisteredChannels()
-            .then((results) => {
-                console.log(`row: ${results}`);
+            //DEBUG FUNCTION: this.readDB();
+            this.updateRegisteredChannels()
+            .then(() => {
+                console.log(this.registeredChannels);
+                this.registerChannel("23123");
+                console.log(this.registeredChannels);
+                this.registerChannel("23522625");
+                console.log(this.registeredChannels);
             })
             .catch((err) => {
                 console.error(err);
@@ -38,13 +48,18 @@ export default class DBCore {
             // Resolve promise
             dbPromise.then((db) => {
                 this.connection = db;
-                this.connection.migrate({
-                    force: "last",
-                    migrationsPath: "./src/database/migrations",
-                })
-                .catch((error) => {
-                    console.error(`Unable to run migrations: ${error}`);
+                this.connection.exec(
+                    `CREATE TABLE IF NOT EXISTS RegisteredChannels (channel_id INTEGER PRIMARY KEY);`)
+                .catch((err) => {
+                    console.error(err);
                 });
+                // this.connection.migrate({
+                //     force: "last",
+                //     migrationsPath: "./src/database/migrations",
+                // })
+                // .catch((error) => {
+                //     console.error(`Unable to run migrations: ${error}`);
+                // });
                 resolve();
             })
             .catch((error) => {
@@ -62,7 +77,7 @@ export default class DBCore {
         if (this.connection == undefined) {
             console.error("Database connection closed.");
         }
-        this.connection.get(`SELECT * FROM RegisteredChannels`)
+        this.connection.all(`SELECT * FROM RegisteredChannels`)
         .then((rows) => {
             console.log(rows);
         })
@@ -72,16 +87,26 @@ export default class DBCore {
     }
 
     /**
-     * Retrieves list of registered channel ids.
-     * @returns channel_ids
+     * Returns array of registered channels.
      */
-    public async getRegisteredChannels(): Promise<string> {
-        return new Promise<string>((resolve, reject) => {
+    public getRegisteredChannels(): string[] {
+        return this.registeredChannels;
+    }
+
+    /**
+     * Retrieves list of registered channel ids.
+     */
+    public async updateRegisteredChannels(): Promise<any[]> {
+        return new Promise<any[]>((resolve, reject) => {
             if (this.connection == undefined) {
                 reject("Database connection closed.");
             }
-            this.connection.get(`SELECT channel_id FROM RegisteredChannels`)
+            this.connection.all(`SELECT channel_id FROM RegisteredChannels`)
             .then((rows) => {
+                this.registeredChannels = [];
+                rows.forEach(id => {
+                    this.registeredChannels.push(id.channel_id);
+                });
                 resolve(rows);
             })
             .catch((err) => {
@@ -94,7 +119,13 @@ export default class DBCore {
      * Register channel to NPCbot's db.
      * @param channel_id
      */
-    public async registerChannel(channel_id: string): Promise<void> {
+    public registerChannel(channel_id: string): void {
+        // If this already exists ignore request.
+        let targetIndex: number;
+        if ((targetIndex = this.registeredChannels.indexOf(channel_id)) !== -1) {
+            return;
+        }
+        this.registeredChannels.push(channel_id);
         const id = parseInt(channel_id, 10);
         this.connection.run(`INSERT INTO RegisteredChannels(channel_id)`
         + ` SELECT ${id} WHERE NOT EXISTS(SELECT 1 FROM RegisteredChannels`
@@ -105,10 +136,17 @@ export default class DBCore {
      * Unregister channel to NPCbot's db if channel exists.
      * @param channel_id
      */
-    public async unregisterChannel(channel_id: string): Promise<void> {
+    public unregisterChannel(channel_id: string): void {
+        // If this does not exist ignore.
+        let targetIndex: number;
+        if ((targetIndex = this.registeredChannels.indexOf(channel_id)) !== -1) {
+            return;
+        }
+        this.registeredChannels.splice(targetIndex, 1);
         const id = parseInt(channel_id, 10);
         this.connection.run(`DELETE FROM RegisteredChannels WHERE channel_id = ${id}`
         + ` AND EXISTS(SELECT 1 FROM RegisteredChannels WHERE channel_id = ${id})`);
+        return;
     }
 
     /**
