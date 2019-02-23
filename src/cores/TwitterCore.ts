@@ -3,7 +3,7 @@ import TwitterClient, { ResponseData } from "twitter";
 /**
  * @classdesc A wrapper class around TwitterClient providing custom functionality.
  */
-export default class CoreTwitter {
+export default class TwitterCore {
 
     private instance: TwitterClient;
 
