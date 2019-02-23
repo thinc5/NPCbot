@@ -1,5 +1,5 @@
 import * as Dotenv from "dotenv";
-import  Discord from "discord.js";
+import Discord from "discord.js";
 
 import DBCore from "./DBCore";
 import TwitterCore from "./TwitterCore";

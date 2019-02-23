@@ -35,15 +35,15 @@ export default class TwitterCore {
      */
     public getTrendingHashtags(params: object, cb: (data: ResponseData) => void): void {
         this.instance.get("trends", params, (error, data, response) => {
-            console.log(error+" "+data+" "+response);
+            console.log(error + " " + data + " " + response);
         });
 
     }
 
     /**
      * Los Angeles (2442047)
-     * @param hashtag 
-     * @param cb 
+     * @param hashtag
+     * @param cb
      */
     public getLaHashtags(): void {
         const params = {
@@ -71,9 +71,8 @@ export default class TwitterCore {
         };
         this.getTweets(params, (data) => {
             // Pick one out of all tweets received to display by random
-            //const randomIndex = Math.floor(Math.random() * (parseInt(params.count, 10) - 1));
-            //console.log(randomIndex);
-            
+            // const randomIndex = Math.floor(Math.random() * (parseInt(params.count, 10) - 1));
+            // console.log(randomIndex);
             if (data.statuses[0] === undefined) {
                 cb(`Unable to find tweet.`);
             } else {

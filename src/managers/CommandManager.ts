@@ -1,5 +1,5 @@
-import {  } from "discord.js"
-import Filesystem from "fs"
+import {  } from "discord.js";
+import Filesystem from "fs";
 
 import Core from "../cores/Core";
 import AbstractManager from "./AbstractManager";
@@ -20,7 +20,7 @@ export default class CommandManager extends AbstractManager {
         this.commandRegistry = new CommandRegistry();
         this.generateImports().then(() => {
             // Remove AbstractCommand from commands to import.
-            let index = this.importPaths.indexOf("AbstractCommand.ts");
+            const index = this.importPaths.indexOf("AbstractCommand.ts");
             if (index !== -1) {
                 this.importPaths.splice(index, 1);
             }
@@ -46,7 +46,7 @@ export default class CommandManager extends AbstractManager {
             } else if (!(new commandClass.default() instanceof AbstractCommand)) {
                 console.log(`Failed to register command. ${path} exported class is not of type "AbstractCommand".`);
             } else if (!this.commandRegistry.registerCommand(new commandClass.default())) {
-                console.log(`Failed to register command as it has already been registered.`)
+                console.log(`Failed to register command as it has already been registered.`);
             }
         }
         console.log(`Successfully imported ${this.commandRegistry.getRegistrySize()} out of ` +
@@ -67,16 +67,16 @@ export default class CommandManager extends AbstractManager {
     public parseCommand(core: Core, raw: string, userId: string, message: Discord.Message): void {
         // TODO: Link to .env
         const commandPrefix = process.env.COMMAND_PREFIX;
-        let substrings: string[] = raw.split(" ");
+        const substrings: string[] = raw.split(" ");
         // Does the line start with the defined prefix?
         if (substrings[0] !== commandPrefix) {
-            console.log("wrong prefix "+raw);
+            console.log("wrong prefix " + raw);
             return;
         }
         // Check if valid command
         if (!this.commandRegistry.hasKey(substrings[1])) {
             // Send usage information to user
-            message.reply("usage"); ///this.commandRegistry.getValue(substrings[1]).getUsage());
+            message.reply("usage"); // this.commandRegistry.getValue(substrings[1]).getUsage());
             return;
         }
         // Try and run command
@@ -85,7 +85,7 @@ export default class CommandManager extends AbstractManager {
             if (command === undefined) {
                 console.log("Command undefined...");
             } else {
-                if ((substrings.length - 2) != command.getNumParams()) {
+                if ((substrings.length - 2) !== command.getNumParams()) {
                     message.reply(`Invalid parameters: ${command.getUsage()}`);
                     return;
                 }
