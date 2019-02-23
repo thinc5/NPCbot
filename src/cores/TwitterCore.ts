@@ -71,12 +71,14 @@ export default class TwitterCore {
         };
         this.getTweets(params, (data) => {
             // Pick one out of all tweets received to display by random
-            // const randomIndex = Math.floor(Math.random() * (parseInt(params.count, 10) - 1));
+            const randomIndex = 0; // Math.floor(Math.random() * (parseInt(params.count, 10) - 1));
             // console.log(randomIndex);
+            console.log(data);
             if (data.statuses[0] === undefined) {
                 cb(`Unable to find tweet.`);
             } else {
-                const tweet: string = data.statuses[0].full_text;
+                const tweet: string = data.statuses[randomIndex].full_text
+                + "\nURL: https://twitter.com/statuses/" +data.statuses[randomIndex].id;
                 cb(`${tweet}`);
             }
         });

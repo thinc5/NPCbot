@@ -14,10 +14,10 @@ export default class Register extends AbstractCommand {
      * @param channelId to send response to.
      * @param args of argument.
      */
-    public async called(core: Core, message :Discord.Message, args: string[]): Promise<void> {
+    public async called(core: Core, message: Discord.Message, args: string[]): Promise<void> {
         // Check if user has administrator access.
-        if (!message.member.permissions.has("ADMINISTRATOR")) {
-            message.channel.send("User does not have Administrator privileges.");
+        if (!message.member.permissions.has("MANAGE_GUILD")) {
+            message.channel.send("User does not have required privileges.");
             return;
         }
         await core.getDBCore().registerChannel(message.channel.id)
