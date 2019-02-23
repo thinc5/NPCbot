@@ -62,14 +62,15 @@ export default class Core {
         });
         this.bot.on("message", (message: Discord.Message) => {
             // Check message isn't empty
-            if (message.content) {
+            // Ignore all bot messages and messages from self
+            if (message.content && !message.author.bot && (message.author.id !== this.bot.user.id)) {
                 this.commandManager.parseCommand(this, message.content, message.author.id, message);
             }
         });
     }
 
     /**
-     * Initialize all NPCbot's managers.
+     * Initialize all NPCbot's helpers.
      */
     public async initialize(): Promise<void> {
         try {

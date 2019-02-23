@@ -6,7 +6,7 @@ import AbstractCommand from "./AbstractCommand";
 export default class LaHashtag extends AbstractCommand {
 
     public constructor() {
-        super("lahashtags", "duh", "usage");
+        super("lahashtags", "duh", "% lahashtags", 0);
     }
 
     /**

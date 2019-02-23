@@ -63,21 +63,23 @@ export default class CoreTwitter {
         // Parameters for query
         const params = {
             q: hashtag,
-            result_type: "popular",
+            result_type: "mixed",
             lang: "en",
-            count: "5",
+            count: "1",
             include_entities: "true",
             tweet_mode: "extended",
         };
         this.getTweets(params, (data) => {
             // Pick one out of all tweets received to display by random
-            let selectedTweet!: string;
-            try {
-                selectedTweet = data.statuses[Math.floor(Math.random() * parseInt(params.count, 10))].retweeted_status.full_text;
-            } catch (err) {
-                console.log("could not get tweet");
+            //const randomIndex = Math.floor(Math.random() * (parseInt(params.count, 10) - 1));
+            //console.log(randomIndex);
+            
+            if (data.statuses[0] === undefined) {
+                cb(`Unable to find tweet.`);
+            } else {
+                const tweet: string = data.statuses[0].full_text;
+                cb(`${tweet}`);
             }
-            cb(`${selectedTweet}`);
         });
     }
 

@@ -10,11 +10,13 @@ export default abstract class AbstractCommand {
     private call: string;
     private description: string;
     private usage: string;
+    private numParams: number
 
-    public constructor(call: string, description: string, usage: string) {
+    public constructor(call: string, description: string, usage: string, numParams: number) {
         this.description = description;
         this.usage = usage;
         this.call = call;
+        this.numParams = numParams;
     }
 
     public getCall(): string {
@@ -29,6 +31,10 @@ export default abstract class AbstractCommand {
         return this.usage;
     }
 
-    public abstract called(core: Core, channel: string, args: string[]): void;
+    public getNumParams(): number {
+        return this.numParams;
+    }
+
+    public abstract called(core: Core, channel: string, numParams: string[]): void;
 
 }

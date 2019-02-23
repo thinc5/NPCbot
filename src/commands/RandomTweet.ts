@@ -6,7 +6,7 @@ import AbstractCommand from "./AbstractCommand";
 export default class RandomTweet extends AbstractCommand {
 
     public constructor() {
-        super("randomtweet", "duh", "usage");
+        super("randtweet", "duh", "% randtweet [query]", 1);
     }
 
     /**
@@ -15,12 +15,10 @@ export default class RandomTweet extends AbstractCommand {
      * @param args of argument.
      */
     public async called(core: Core, channel: string, args: string[]) : Promise<void> {
-        console.log("called randomtweet");
         const channelTarget: Discord.TextChannel = core.getBot().channels.get(channel) as Discord.TextChannel;
         if (channelTarget !== undefined) {
             if (channelTarget.type == "text") {
-                channelTarget.send("Fetching your tweet! :MonkaSS:");
-                await core.getTwitterInstance().getRandomTweet("Node.js", (tweet) => {
+                await core.getTwitterInstance().getRandomTweet(args[0], (tweet) => {
                     if (channel !== undefined) {
                        channelTarget.send(tweet);
                     }

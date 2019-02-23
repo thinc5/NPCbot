@@ -85,7 +85,11 @@ export default class CommandManager extends AbstractManager {
             if (command === undefined) {
                 console.log("Command undefined...");
             } else {
-                command.called(core, message.channel.id, substrings.slice(1));
+                if ((substrings.length - 2) != command.getNumParams()) {
+                    message.reply(`Invalid parameters: ${command.getUsage()}`);
+                    return;
+                }
+                command.called(core, message.channel.id, substrings.slice(2));
             }
         } catch (err) {
             console.error(err);
