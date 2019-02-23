@@ -1,5 +1,4 @@
 import {  } from "discord.js";
-import Filesystem from "fs";
 
 import Core from "../cores/Core";
 import AbstractManager from "./AbstractManager";
@@ -70,13 +69,12 @@ export default class CommandManager extends AbstractManager {
         const substrings: string[] = raw.split(" ");
         // Does the line start with the defined prefix?
         if (substrings[0] !== commandPrefix) {
-            console.log("wrong prefix " + raw);
             return;
         }
         // Check if valid command
         if (!this.commandRegistry.hasKey(substrings[1])) {
             // Send usage information to user
-            message.reply("usage"); // this.commandRegistry.getValue(substrings[1]).getUsage());
+            message.channel.send("usage nerd"); // this.commandRegistry.getValue(substrings[1]).getUsage());
             return;
         }
         // Try and run command
@@ -89,7 +87,7 @@ export default class CommandManager extends AbstractManager {
                     message.reply(`Invalid parameters: ${command.getUsage()}`);
                     return;
                 }
-                command.called(core, message.channel.id, substrings.slice(2));
+                command.called(core, message, substrings.slice(2));
             }
         } catch (err) {
             console.error(err);

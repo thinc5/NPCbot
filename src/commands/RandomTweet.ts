@@ -14,17 +14,12 @@ export default class RandomTweet extends AbstractCommand {
      * @param channelId to send response to.
      * @param args of argument.
      */
-    public async called(core: Core, channel: string, args: string[]): Promise<void> {
-        const channelTarget: Discord.TextChannel = core.getBot().channels.get(channel) as Discord.TextChannel;
-        if (channelTarget !== undefined) {
-            if (channelTarget.type === "text") {
-                await core.getTwitterManager().getRandomTweet(args[0], (tweet) => {
-                    if (channel !== undefined) {
-                       channelTarget.send(tweet);
-                    }
-                });
+    public async called(core: Core, message: Discord.Message, args: string[]): Promise<void> {
+        await core.getTwitterManager().getRandomTweet(args[0], (tweet) => {
+            if (message.channel !== undefined) {
+                message.channel.send(tweet);
             }
-        }
+        });
     }
 
 }

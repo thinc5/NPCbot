@@ -21,13 +21,6 @@ export default class DBCore {
             console.log("Database Manager connected.");
             // DEBUG FUNCTION: this.readDB();
             this.updateRegisteredChannels()
-            .then(() => {
-                console.log(this.registeredChannels);
-                this.registerChannel("23123");
-                console.log(this.registeredChannels);
-                this.registerChannel("23522625");
-                console.log(this.registeredChannels);
-            })
             .catch((err) => {
                 console.error(err);
             });
@@ -49,7 +42,7 @@ export default class DBCore {
             dbPromise.then((db) => {
                 this.connection = db;
                 this.connection.exec(
-                    `CREATE TABLE IF NOT EXISTS RegisteredChannels (channel_id INTEGER PRIMARY KEY);`)
+                    `CREATE TABLE IF NOT EXISTS RegisteredChannels (channel_id TEXT PRIMARY KEY);`)
                 .catch((err) => {
                     console.error(err);
                 });
@@ -70,7 +63,7 @@ export default class DBCore {
     }
 
     /**
-     * Debug function to show all .
+     * Debug function to show all registered channels.
      * @param query SQL query to be "executed".
      */
     public async readDB(): Promise<void> {
@@ -105,7 +98,7 @@ export default class DBCore {
             .then((rows) => {
                 this.registeredChannels = [];
                 rows.forEach((id) => {
-                    this.registeredChannels.push(id.channel_id.toString());
+                    this.registeredChannels.push(id.channel_id);
                 });
                 resolve(rows);
             })
@@ -119,34 +112,35 @@ export default class DBCore {
      * Register channel to NPCbot's db.
      * @param channel_id
      */
-    public registerChannel(channelID: string): void {
-        // If this already exists ignore request.
-        const targetIndex: number = this.registeredChannels.indexOf(channelID);
-        if (targetIndex !== -1) {
-            return;
-        }
-        this.registeredChannels.push(channelID);
-        const id = parseInt(channelID, 10);
-        this.connection.run(`INSERT INTO RegisteredChannels(channel_id)`
-        + ` SELECT ${id} WHERE NOT EXISTS(SELECT 1 FROM RegisteredChannels`
-        + ` WHERE channel_id = ${id});`);
+    public async registerChannel(channelID: string): Promise<string> {
+        return new Promise<string>(() => {
+            // If this already exists ignore request.
+            const targetIndex: number = this.registeredChannels.indexOf(channelID);
+            if (targetIndex !== -1) {
+                throw new Error("already registered");
+            }
+            this.registeredChannels.push(channelID);
+            this.connection.run(`INSERT INTO RegisteredChannels(channel_id)`
+            + ` SELECT ${channelID} WHERE NOT EXISTS(SELECT 1 FROM RegisteredChannels`
+            + ` WHERE channel_id = ${channelID});`);
+        });
     }
 
     /**
      * Unregister channel to NPCbot's db if channel exists.
      * @param channel_id
      */
-    public unregisterChannel(channelID: string): void {
-        // If this does not exist ignore.
-        const targetIndex: number = this.registeredChannels.indexOf(channelID);
-        if (targetIndex !== -1) {
-            return;
-        }
-        this.registeredChannels.splice(targetIndex, 1);
-        const id = parseInt(channelID, 10);
-        this.connection.run(`DELETE FROM RegisteredChannels WHERE channel_id = ${id}`
-        + ` AND EXISTS(SELECT 1 FROM RegisteredChannels WHERE channel_id = ${id})`);
-        return;
+    public async unregisterChannel(channelID: string): Promise<string> {
+        return new Promise<string>(() => {
+            // If this channel does not exist ignore.
+            const targetIndex: number = this.registeredChannels.indexOf(channelID);
+            if (targetIndex === -1) {
+                throw new Error("not already registered");
+            }
+            this.registeredChannels.splice(targetIndex, 1);
+            this.connection.run(`DELETE FROM RegisteredChannels WHERE channel_id = ${channelID}`
+            + ` AND EXISTS(SELECT 1 FROM RegisteredChannels WHERE channel_id = ${channelID})`);
+        });
     }
 
     /**

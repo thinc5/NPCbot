@@ -14,14 +14,8 @@ export default class LaHashtag extends AbstractCommand {
      * @param channelId to send response to.
      * @param args of argument.
      */
-    public async called(core: Core, channel: string, args: string[]): Promise<void> {
-        console.log("called lahastags");
-        const channelTarget: Discord.TextChannel = core.getBot().channels.get(channel) as Discord.TextChannel;
-        if (channelTarget !== undefined) {
-            if (channelTarget.type === "text") {
-                await core.getTwitterManager().getLaHashtags();
-            }
-        }
+    public async called(core: Core, message: Discord.Message, args: string[]): Promise<void> {
+        await core.getTwitterManager().getLaHashtags();
     }
 
 }

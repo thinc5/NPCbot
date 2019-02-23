@@ -35,6 +35,6 @@ export default abstract class AbstractCommand {
         return this.numParams;
     }
 
-    public abstract called(core: Core, channel: string, numParams: string[]): void;
+    public abstract called(core: Core, message: Discord.Message, numParams: string[]): void;
 
 }

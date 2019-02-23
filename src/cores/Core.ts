@@ -50,6 +50,7 @@ export default class Core {
             console.error(`Unable to login to discord, check tokens and .env variables. ${err}`);
         });
         this.bot.on("ready", async () => {
+            this.bot.user.setActivity("potshot alex lol", {type: "PLAYING"});
             console.log(`${this.bot.user.username} is online!`);
         });
         this.bot.on("message", (message: Discord.Message) => {
