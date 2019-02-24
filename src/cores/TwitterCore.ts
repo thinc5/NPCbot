@@ -34,10 +34,12 @@ export default class TwitterCore {
      * Get trending hashtags in provided WOID location.
      */
     public getTrendingHashtags(params: object, cb: (data: ResponseData) => void): void {
-        this.instance.get("trends", params, (error, data, response) => {
+        this.instance.get("trends/avaliable", (error, data, response) => {
+            console.log(error + " " + data + " " + response.statusCode);
+        });
+        this.instance.get("trends/place", params, (error, data, response) => {
             console.log(error + " " + data + " " + response);
         });
-
     }
 
     /**
@@ -49,7 +51,6 @@ export default class TwitterCore {
         const params = {
             id: 2442047,
         };
-
         this.getTrendingHashtags(params, (response) => {
             console.log(response);
         });
@@ -57,7 +58,8 @@ export default class TwitterCore {
 
     /**
      * Get a random tweet from twitter with provided hashtag.
-     * @param object params,
+     * @param object params
+     * @param cb callback that returns the tweet in string form
      */
     public getRandomTweet(hashtag: string, cb: (tweet: string) => void): void {
         // Parameters for query
@@ -65,20 +67,22 @@ export default class TwitterCore {
             q: hashtag,
             result_type: "mixed",
             lang: "en",
-            count: "1",
-            include_entities: "true",
+            count: "50",
+            include_entities: "false",
             tweet_mode: "extended",
         };
-        this.getTweets(params, (data) => {
+        this.getTweets(params, (data: TwitterClient.ResponseData) => {
             // Pick one out of all tweets received to display by random
-            const randomIndex = 0; // Math.floor(Math.random() * (parseInt(params.count, 10) - 1));
-            // console.log(randomIndex);
-            console.log(data);
-            if (data.statuses[0] === undefined) {
+            const totalTweets: string[] = [];
+            data.statuses.forEach((e: string) => {
+                totalTweets.push(e);
+            });
+            const randomIndex = Math.floor(Math.random() * (totalTweets.length - 1));
+            if (data.statuses[randomIndex] === undefined) {
                 cb(`Unable to find tweet.`);
             } else {
                 const tweet: string = data.statuses[randomIndex].full_text
-                + "\nURL: https://twitter.com/statuses/" +data.statuses[randomIndex].id;
+                + "\nURL: https://twitter.com/statuses/" + data.statuses[randomIndex].id;
                 cb(`${tweet}`);
             }
         });

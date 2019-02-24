@@ -113,16 +113,17 @@ export default class DBCore {
      * @param channel_id
      */
     public async registerChannel(channelID: string): Promise<string> {
-        return new Promise<string>(() => {
+        return new Promise<string>((resolve, reject) => {
             // If this already exists ignore request.
             const targetIndex: number = this.registeredChannels.indexOf(channelID);
             if (targetIndex !== -1) {
-                throw new Error("already registered");
+                reject(new Error("already registered"));
             }
             this.registeredChannels.push(channelID);
             this.connection.run(`INSERT INTO RegisteredChannels(channel_id)`
             + ` SELECT ${channelID} WHERE NOT EXISTS(SELECT 1 FROM RegisteredChannels`
             + ` WHERE channel_id = ${channelID});`);
+            resolve();
         });
     }
 
@@ -131,15 +132,16 @@ export default class DBCore {
      * @param channel_id
      */
     public async unregisterChannel(channelID: string): Promise<string> {
-        return new Promise<string>(() => {
+        return new Promise<string>((resolve, reject) => {
             // If this channel does not exist ignore.
             const targetIndex: number = this.registeredChannels.indexOf(channelID);
             if (targetIndex === -1) {
-                throw new Error("not already registered");
+                reject(new Error("not already registered"));
             }
             this.registeredChannels.splice(targetIndex, 1);
             this.connection.run(`DELETE FROM RegisteredChannels WHERE channel_id = ${channelID}`
             + ` AND EXISTS(SELECT 1 FROM RegisteredChannels WHERE channel_id = ${channelID})`);
+            resolve("");
         });
     }
 
