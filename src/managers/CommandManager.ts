@@ -95,4 +95,16 @@ export default class CommandManager extends AbstractManager {
         return;
     }
 
+    /**
+     * Return an array of commands and their descriptions + usage information.
+     * @returns commands string[]
+     */
+    public getCommands(): string[] {
+        const commands: string[] = ["Command | Usage | Description"];
+        this.commandRegistry.getRegistry().forEach((e) => {
+            commands.push(`${e.getCall()} | ${e.getUsage()} | ${e.getDescription()}`);
+        });
+        return commands;
+    }
+
 }
