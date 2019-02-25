@@ -82,7 +82,7 @@ export default class TwitterCore {
             const trends: any[] = data[0].trends;
             let hashtags: string[] = ["Tag    :  Number of Tweets"];
             trends.forEach((trend) => {
-                hashtags.push(`${trend.name}   |   ${trend.tweet_volume}|`);
+                hashtags.push(`${trend.name}   |   ${trend.tweet_volume}`);
             });
             // Limit the number of results to 10
             // TODO: figure out why some dont have a tweet_volume
