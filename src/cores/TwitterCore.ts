@@ -86,7 +86,7 @@ export default class TwitterCore {
             });
             // Limit the number of results to 10
             // TODO: figure out why some dont have a tweet_volume
-            hashtags.slice(0, 10);
+            hashtags = hashtags.slice(0, 10);
             cb(hashtags);
         });
     }
