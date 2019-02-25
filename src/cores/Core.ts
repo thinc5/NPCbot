@@ -5,6 +5,7 @@ import DBCore from "./DBCore";
 import TwitterCore from "./TwitterCore";
 import CommandManager from "../managers/CommandManager";
 import ThoughtCore from "./ThoughtCore";
+import RPCCore from "./RPCCore";
 
 /**
  * @classdesc The main routine based around the Discord.Client Object.
@@ -15,6 +16,11 @@ export default class Core {
      * discord.js client implementation.
      */
     private bot: Discord.Client;
+
+    /**
+     * 
+     */
+    private rpc: RPCCore;
 
     /**
      * Database manager.
@@ -42,6 +48,7 @@ export default class Core {
     public constructor() {
         Dotenv.config();
         this.bot = new Discord.Client();
+        this.rpc = new RPCCore();
         this.databaseCore = new DBCore();
         this.twitterCore = new TwitterCore();
         this.commandManager = new CommandManager(this);
