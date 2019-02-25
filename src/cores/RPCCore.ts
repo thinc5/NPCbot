@@ -11,7 +11,10 @@ export default class RPCCore {
         this.rpc = new RPC.Client({ transport: "websocket"});
         const clientId: string = process.env.BOT_CLIENT_ID as string;
         const scopes: string[] = ["rpc", "rpc.api", "messages.read"];
-        this.rpc.login({clientId, scopes});
+        this.rpc.login({clientId, scopes})
+        .catch((err) => {
+            console.log(err);
+        });
         this.rpc.on("ready", () => {
             this.rpc.setActivity({
                 state: "thinking really hard Pepega",
@@ -19,6 +22,9 @@ export default class RPCCore {
                 largeImageText: "Pepega",
                 smallImageKey: "raf_750x1000_075_t_heather_grey_u1",
                 smallImageText: "raf_750x1000_075_t_heather_grey_u1",
+            })
+            .catch((err) => {
+                console.log(err);
             });
         });
     }
