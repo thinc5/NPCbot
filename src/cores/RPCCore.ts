@@ -10,7 +10,8 @@ export default class RPCCore {
     public constructor() {
         this.rpc = new RPC.Client({ transport: "ipc"});
         const clientId: string = process.env.BOT_CLIENT_ID as string;
-        const scopes: string[] = ["rpc", "rpc.api", "messages.read"];
+        console.log(clientId);
+        const scopes: string[] = ["rpc", "rpc.api"];
         this.rpc.login({clientId, scopes})
         .catch((err) => {
             console.log("Login: " + err);
