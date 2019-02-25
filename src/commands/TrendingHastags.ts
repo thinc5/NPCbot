@@ -19,7 +19,7 @@ export default class TrendingHashtags extends AbstractCommand {
         await core.getTwitterManager().getTrendingHashtags(args[0], (hashtags: string[]) => {
             let desc: string = "";
             hashtags.forEach((tag) => {
-                desc.concat(`${tag}\n`);
+                desc = desc.concat(`${tag}\n`);
             });
             message.channel.send({embed: {
                 color: 3447003,

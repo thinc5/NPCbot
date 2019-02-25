@@ -76,6 +76,7 @@ export default class TwitterCore {
             if (response.statusCode !== 200) {
                 cb(["Unable to find trending data for provided location."]);
             }
+            console.log(data);
             const trends: any[] = data[0].trends;
             let hashtags: string[] = ["Tag    :  Number of Tweets"];
             trends.forEach((trend) => {
