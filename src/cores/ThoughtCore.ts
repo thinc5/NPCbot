@@ -31,8 +31,10 @@ export default class ThoughtCore {
     public start(): void {
         this.activityInterval = setInterval(() => {
             this.progressUpdate();
-        }, 4000);
-        // this.moodUpdate();
+        }, 1000 * 4);   // Only update every 4 seconds.
+        setInterval(() => {
+            this.avatarUpdate();
+        }, (1000 * 30 * 60)); // Only update every 30 seconds.
     }
 
     /**
@@ -57,19 +59,25 @@ export default class ThoughtCore {
         const base = "##########";
         const bars = Math.floor(this.progress / 10);
         bar = base.substr(0, bars) + bar.substr(bars);
-        this.core.updateActivity(`Opinion [${bar}] ${this.progress}%`);
+        this.core.updateActivity(`[${bar}] ${this.progress}%`);
         setTimeout(() => {
-            this.core.updateActivity(`% register to sign up for knowledge`);
+            this.core.updateActivity(`% help`);
         }, 2000);
     }
 
     /**
-     * Update bots avitar based off status.
+     * Update bots avatar based off status.
      */
-    private moodUpdate(): void {
-        setTimeout(() => {
+    private avatarUpdate(): void {
+        if (this.progress < 50) {
+            this.core.updateAvatar("res/main.png");
+        } else if (this.progress < 60) {
+            this.core.updateAvatar("res/soy.png");
+        } else if (this.progress < 80) {
+            this.core.updateAvatar("res/smug.png");
+        } else {
             this.core.updateAvatar("res/angry.png");
-        }, 5000);
+        }
     }
 
 }

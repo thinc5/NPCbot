@@ -83,7 +83,9 @@ export default class CommandManager extends AbstractManager {
             if (command === undefined) {
                 console.log("Command undefined...");
             } else {
-                if ((substrings.length - 2) !== command.getNumParams()) {
+                substrings[substrings.length - 1].trimRight();
+                if (((command.getNumParams() === -1) && (substrings.length === 2)) ||
+                    ((substrings.length - 2) !== command.getNumParams() && command.getNumParams() !== -1)) {
                     message.reply(`Invalid parameters: ${command.getUsage()}`);
                     return;
                 }

@@ -31,6 +31,39 @@ export default class TwitterCore {
     }
 
     /**
+     * Get tweets from twitter given a provided hashtag.
+     */
+    public async getMaterialByTweet(hashtags: string[], cb: (tweets: string[][]) => void): Promise<void> {
+        const parmams = {
+            q: "",
+            result_type: "mixed",
+            lang: "en",
+            count: "250",
+            include_entities: "true",
+            tweet_mode: "extended",
+        };
+        // Get responses for each hashtag
+        const rawdata: any[] = [];
+        await hashtags.forEach((tag) => {
+            parmams.q = tag;
+            this.getTweets(parmams, (data) => {
+                rawdata.push(data.statuses);
+                console.log(data);
+            });
+        });
+        console.log(hashtags);
+        console.log(rawdata);
+        const tweets: string[][] = [[]];
+        rawdata.forEach((data: any) => {
+            const query = data.search_metadata.query;
+            rawdata.forEach((rawtweet: any) => {
+                tweets.push([rawtweet.id_str, rawtweet.full_text, query]);
+            });
+        });
+        cb(tweets);
+    }
+
+    /**
      * Get trending hashtags in provided WOID location.
      */
     public getTrendingHashtags(params: object, cb: (data: ResponseData) => void): void {

@@ -46,6 +46,11 @@ export default class DBCore {
                 .catch((err) => {
                     console.error(err);
                 });
+                this.connection.exec(
+                    `CREATE TABLE IF NOT EXISTS Trends (tweet_id TEXT PRIMARY KEY, hashtag TEXT NOT NULL, text TEXT NOT NULL);`)
+                .catch((err) => {
+                    console.error(err);
+                });
                 // this.connection.migrate({
                 //     force: "last",
                 //     migrationsPath: "./src/migrations",
@@ -141,7 +146,7 @@ export default class DBCore {
             this.registeredChannels.splice(targetIndex, 1);
             this.connection.run(`DELETE FROM RegisteredChannels WHERE channel_id = ${channelID}`
             + ` AND EXISTS(SELECT 1 FROM RegisteredChannels WHERE channel_id = ${channelID})`);
-            resolve("");
+            resolve("Gucci Mane");
         });
     }
 
@@ -159,6 +164,30 @@ export default class DBCore {
         })
         .catch((error) => {
             console.error(`Unable to read from database, check it exists. ${error}`);
+        });
+    }
+
+    /**
+     * Given a two dimensional array of strings with tweet_id, query and text,
+     * import data into database.
+     */
+    public storeTweets(data: string[][]): void {
+        let query = "INSERT INTO Trends (tweet_id, hashtag, text) VALUES";
+        const values: string[] = [];
+        data.forEach((tweet) => {
+            query = query.concat(`(?, ?, ?),`);
+            values.push(tweet[0], tweet[1], tweet[2]);
+        });
+        query.slice(query.length - 1);
+        query.concat(";");
+        console.log(query);
+        console.log(values);
+        this.connection.prepare(query)
+        .then((statement) => {
+            statement.run(values);
+        })
+        .catch((err) => {
+            console.log(err);
         });
     }
 

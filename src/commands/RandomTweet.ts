@@ -6,7 +6,7 @@ import AbstractCommand from "./AbstractCommand";
 export default class RandomTweet extends AbstractCommand {
 
     public constructor() {
-        super("randomtweet", "Request a random tweet related to the provided query", "% randomtweet [query]", 1);
+        super("randomtweet", "Request a random tweet related to the provided query", "% randomtweet [query]", -1);
     }
 
     /**
@@ -18,7 +18,7 @@ export default class RandomTweet extends AbstractCommand {
         await core.getTwitterManager().getRandomTweet(args[0], (tweet, url, mediaUrl) => {
             if (message.channel !== undefined) {
                 message.channel.send(new Discord.RichEmbed()
-                    .setTitle(`Selected tweet from query: ${args[0]}`)
+                    .setTitle(`Selected tweet from query: ${args}`)
                     // .setAuthor("thinc5", "")
                     .setColor(0x00AE86)
                     .setDescription(`${tweet}`)
