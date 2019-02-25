@@ -59,9 +59,6 @@ export default class Core {
         this.bot.on("ready", async () => {
             console.log(`${this.bot.user.username} is online!`);
             this.thoughtCore.start();
-            this.getTwitterManager().getMaterialByTweet(["dog", "cat"], (tweets) => {
-                this.getDBCore().storeTweets(tweets);
-            })
         });
         this.bot.on("message", (message: Discord.Message) => {
             // Check message isn't empty
