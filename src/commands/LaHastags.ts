@@ -15,7 +15,12 @@ export default class LaHashtag extends AbstractCommand {
      * @param args of argument.
      */
     public async called(core: Core, message: Discord.Message, args: string[]): Promise<void> {
-        await core.getTwitterManager().getLaHashtags();
+        await core.getTwitterManager().getLaHashtags((hashtags) => {
+            message.channel.send({embed: {
+                color: 3447003,
+                description: hashtags,
+              }});
+        });
     }
 
 }

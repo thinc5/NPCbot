@@ -4,6 +4,7 @@ import Discord from "discord.js";
 import DBCore from "./DBCore";
 import TwitterCore from "./TwitterCore";
 import CommandManager from "../managers/CommandManager";
+import ThoughtCore from "./ThoughtCore";
 
 /**
  * @classdesc The main routine based around the Discord.Client Object.
@@ -31,6 +32,11 @@ export default class Core {
     private commandManager: CommandManager;
 
     /**
+     * ThoughtCore instance.
+     */
+    private thoughtCore: ThoughtCore;
+
+    /**
      * @classdesc Core of NPC bot.
      */
     public constructor() {
@@ -39,6 +45,7 @@ export default class Core {
         this.databaseCore = new DBCore();
         this.twitterCore = new TwitterCore();
         this.commandManager = new CommandManager(this);
+        this.thoughtCore = new ThoughtCore(this);
     }
 
     /**
@@ -51,6 +58,7 @@ export default class Core {
         });
         this.bot.on("ready", async () => {
             console.log(`${this.bot.user.username} is online!`);
+            this.thoughtCore.start();
         });
         this.bot.on("message", (message: Discord.Message) => {
             // Check message isn't empty
@@ -98,7 +106,17 @@ export default class Core {
      * @param activity string to set activity to.
      */
     public updateActivity(activity: string): void {
-        this.bot.user.setActivity(activity, {type: "STREAMING"});
+        this.bot.user.setActivity(activity, {type: 3});
+    }
+
+    /**
+     * Update the bot's avatar provided a filepath.
+     */
+    public updateAvatar(filepath: string): void {
+        this.bot.user.setAvatar(filepath)
+        .catch((err) => {
+            console.error(err);
+        });
     }
 }
 
