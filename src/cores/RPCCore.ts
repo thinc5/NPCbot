@@ -8,7 +8,7 @@ export default class RPCCore {
     private rpc: RPC.Client;
 
     public constructor() {
-        this.rpc = new RPC.Client({ transport: "websocket"});
+        this.rpc = new RPC.Client({ transport: "ipc"});
         const clientId: string = process.env.BOT_CLIENT_ID as string;
         const scopes: string[] = ["rpc", "rpc.api", "messages.read"];
         this.rpc.login({clientId, scopes})
