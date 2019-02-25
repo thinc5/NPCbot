@@ -73,8 +73,10 @@ export default class TwitterCore {
             id: parseInt(woeid, 10),
         };
         this.instance.get("trends/place", params, (error, data, response) => {
-            if (response.statusCode !== 200) {
+            if (response.statusCode !== 200 || error) {
+                console.log(error);
                 cb(["Unable to find trending data for provided location."]);
+                return;
             }
             console.log(data);
             const trends: any[] = data[0].trends;
