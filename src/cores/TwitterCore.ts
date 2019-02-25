@@ -76,6 +76,8 @@ export default class TwitterCore {
             if (response.statusCode !== 200) {
                 console.log(error);
             }
+            console.log(data);
+            console.log(error);
             const trends: any[] = data[0].trends;
             let hashtags: string[] = ["Tag    :  Number of Tweets"];
             trends.forEach((trend) => {
