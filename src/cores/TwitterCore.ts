@@ -68,7 +68,7 @@ export default class TwitterCore {
      * @param hashtag
      * @param cb
      */
-    public getTrendingHashtags(woeid: string, cb: (hashtags: string) => void): void {
+    public getTrendingHashtags(woeid: string, cb: (hashtags: string[]) => void): void {
         const params = {
             id: parseInt(woeid, 10),
         };
@@ -77,11 +77,14 @@ export default class TwitterCore {
                 console.log(error);
             }
             const trends: any[] = data[0].trends;
-            let hashtags = "|Tag|Tweets|\n|---|---|\n";
+            let hashtags: string[] = ["Tag    :  Number of Tweets"];
             trends.forEach((trend) => {
-                hashtags = hashtags.concat(`|${trend.name}|${trend.tweet_volume}|\n`);
+                hashtags.push(`${trend.name}   |   ${trend.tweet_volume}|`);
             });
-            cb(`${hashtags}`);
+            // Limit the number of results to 10
+            // TODO: figure out why some dont have a tweet_volume
+            hashtags.slice(10);
+            cb(hashtags);
         });
     }
 
