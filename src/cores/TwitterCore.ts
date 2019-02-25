@@ -34,7 +34,7 @@ export default class TwitterCore {
      * Get trending hashtags in provided WOID location.
      */
     public getTrendingHashtags(params: object, cb: (data: ResponseData) => void): void {
-        this.instance.get("trends/avaliable", (error, data, response) => {
+        this.instance.get("trends", (error, data, response) => {
             console.log(error + " " + data + " " + response.statusCode);
         });
         this.instance.get("trends/place", params, (error, data, response) => {

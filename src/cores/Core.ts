@@ -50,7 +50,6 @@ export default class Core {
             console.error(`Unable to login to discord, check tokens and .env variables. ${err}`);
         });
         this.bot.on("ready", async () => {
-            this.bot.user.setActivity("potshot alex lol", {type: "PLAYING"});
             console.log(`${this.bot.user.username} is online!`);
         });
         this.bot.on("message", (message: Discord.Message) => {
@@ -92,6 +91,14 @@ export default class Core {
      */
     public getCommandManager(): CommandManager {
         return this.commandManager;
+    }
+
+    /**
+     * Update the bot's status given a provided activity description.
+     * @param activity string to set activity to.
+     */
+    public updateActivity(activity: string): void {
+        this.bot.user.setActivity(activity, {type: "STREAMING"});
     }
 }
 
