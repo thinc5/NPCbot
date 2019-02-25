@@ -64,28 +64,19 @@ export default class TwitterCore {
     }
 
     /**
-     * Get trending hashtags in provided WOID location.
+     * Get top hashtags by WOEID found http://woeid.rosselliot.co.nz/
+     * @param hashtag
+     * @param cb
      */
-    public getTrendingHashtags(params: object, cb: (data: ResponseData) => void): void {
+    public getTrendingHashtags(woeid: string, cb: (hashtags: string) => void): void {
+        const params = {
+            id: parseInt(woeid, 10),
+        };
         this.instance.get("trends/place", params, (error, data, response) => {
             if (response.statusCode !== 200) {
                 console.log(error);
             }
-            cb(data);
-        });
-    }
-
-    /**
-     * Los Angeles (2442047)
-     * @param hashtag
-     * @param cb
-     */
-    public getLaHashtags(cb: (hashtags: string) => void): void {
-        const params = {
-            id: 2442047,
-        };
-        this.getTrendingHashtags(params, (response) => {
-            const trends: any[] = response[0].trends;
+            const trends: any[] = data[0].trends;
             let hashtags = "|Tag|Tweets|\n|---|---|\n";
             trends.forEach((trend) => {
                 hashtags = hashtags.concat(`|${trend.name}|${trend.tweet_volume}|\n`);

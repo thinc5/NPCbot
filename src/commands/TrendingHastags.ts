@@ -3,10 +3,11 @@ import Discord, { Message } from "discord.js";
 import Core from "../cores/Core";
 import AbstractCommand from "./AbstractCommand";
 
-export default class LaHashtag extends AbstractCommand {
+export default class TrendingHashtags extends AbstractCommand {
 
     public constructor() {
-        super("lahashtags", "Get the trending tweets in Los Angeles", "% lahashtags", 0);
+        super("trendinghashtags", "Get the trending tweets in a provided woeid"
+        + "(can be found at http://woeid.rosselliot.co.nz/)", "% trendinghashtags [woeid]", 1);
     }
 
     /**
@@ -15,7 +16,8 @@ export default class LaHashtag extends AbstractCommand {
      * @param args of argument.
      */
     public async called(core: Core, message: Discord.Message, args: string[]): Promise<void> {
-        await core.getTwitterManager().getLaHashtags((hashtags) => {
+        await core.getTwitterManager().getTrendingHashtags(args[0], (hashtags) => {
+            hashtags = hashtags.slice(10);
             message.channel.send({embed: {
                 color: 3447003,
                 description: hashtags,
