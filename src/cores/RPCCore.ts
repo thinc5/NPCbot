@@ -13,9 +13,10 @@ export default class RPCCore {
         const scopes: string[] = ["rpc", "rpc.api", "messages.read"];
         this.rpc.login({clientId, scopes})
         .catch((err) => {
-            console.log(err);
+            console.log("Login: " + err);
         });
         this.rpc.on("ready", () => {
+            RPC.register(clientId);
             this.rpc.setActivity({
                 state: "thinking really hard Pepega",
                 largeImageKey: "raf_750x1000_075_t_heather_grey_u1",
@@ -24,7 +25,7 @@ export default class RPCCore {
                 smallImageText: "raf_750x1000_075_t_heather_grey_u1",
             })
             .catch((err) => {
-                console.log(err);
+                console.log("Activity: " + err);
             });
         });
     }
