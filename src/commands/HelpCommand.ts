@@ -17,7 +17,6 @@ export default class Help extends AbstractCommand {
     public async called(core: Core, message: Discord.Message, args: string[]): Promise<void> {
         const commands = core.getCommandManager().getCommands();
         let embed = new Discord.RichEmbed()
-            .setTitle(`Help:`)
             .setColor(0x00AE86)
             .setDescription(`All commands of the NPC bot.`)
             .setFooter(`Brought to you by the engineers at Dotma! (dotma.me)`);

@@ -2,6 +2,7 @@ import Discord, { Message } from "discord.js";
 
 import Core from "../cores/Core";
 import AbstractCommand from "./AbstractCommand";
+import { TweetData } from "../cores/ITweetData";
 
 export default class RandomTweet extends AbstractCommand {
 
@@ -15,23 +16,20 @@ export default class RandomTweet extends AbstractCommand {
      * @param args of argument.
      */
     public async called(core: Core, message: Discord.Message, args: string[]): Promise<void> {
-        await core.getTwitterManager().getRandomTweet(args[0], (tweet, url, mediaUrl) => {
+        await core.getTwitterManager().getRandomTweet(args.join())
+        .then((tweet) => {
             if (message.channel !== undefined) {
-                message.channel.send(new Discord.RichEmbed()
-                    .setTitle(`Selected tweet from query: ${args}`)
-                    // .setAuthor("thinc5", "")
-                    .setColor(0x00AE86)
-                    .setDescription(`${tweet}`)
-                    .setFooter(`Brought to you by the engineers at Dotma! (dotma.me)`)
-                    .setImage(`${mediaUrl}`)
-                    // .setThumbnail("http://i.imgur.com/p2qNFag.png")
-                    .setTimestamp()
-                    .setURL(`${url}`),
-                    // .addField("This is a field title, it can hold 256 characters", "This is a field value, it can hold 1024 characters.")
-                    // .addField("Inline Field", "They can also be inline.", true)
-                    // .addBlankField(true)
-                    // .addField("Inline Field 3", "You can have a maximum of 25 fields.", true);
-                );
+                let embed = new Discord.RichEmbed();
+                embed.setTitle(`Selected tweet from query: ${args}`)
+                .setColor(0x00AE86)
+                .setDescription(tweet.text)
+                .setFooter(`Brought to you by the engineers at Dotma! (dotma.me)`)
+                .setTimestamp()
+                .setURL(tweet.url);
+                if (tweet.media !== undefined) {
+                    embed.setImage(tweet.media);
+                }
+                message.channel.send(embed);
             }
         });
     }

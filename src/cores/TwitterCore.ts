@@ -1,6 +1,8 @@
 import TwitterClient, { ResponseData } from "twitter";
+import { TweetData } from "./ITweetData";
 
-/**
+
+/**om "../NPCbot";
  * @classdesc A wrapper class around TwitterClient providing custom functionality.
  */
 export default class TwitterCore {
@@ -20,20 +22,71 @@ export default class TwitterCore {
      * @param params object specifying search parameters
      * @param cb callback
      */
-    public getTweets(params: object, cb: (data: ResponseData) => void): void {
-        this.instance.get("search/tweets", params, (error, data, response) => {
-            if (error) {
-                console.log(error);
-            } else {
-                cb(data);
+    public async getTweets(params: object): Promise<TwitterClient.ResponseData> {
+        return new Promise<TwitterClient.ResponseData>((resolve, reject) => {
+            this.instance.get("search/tweets", params, (error, data, response) => {
+                if (response.statusCode !== 200) {
+                    reject(error);
+                }
+                resolve(data);
+            });
+        });
+    }
+
+    /**
+     * Given a tweet from a TwitterClient.ResponseData.statuses object,
+     * parse the tweet text and other important values and return in a json object.
+     * @param TwitterClient.ResponseData.statuses tweet to parse.
+     * @returns json
+     */
+    public parseTweet(rawTweet: any): TweetData {
+        let tweet: TweetData = {
+            url: `https://twitter.com/user/status/${rawTweet.id_str}`,
+            text: rawTweet.full_text,
+        };
+        try {
+            if (rawTweet.entities.media[0].media_url_https !== undefined) {
+                tweet.media = rawTweet.entities.media[0].media_url_https;
             }
+        } catch (err) {
+            // ignore
+        }
+        return tweet;
+    }
+
+    /**
+     * Get a random tweet from twitter with provided hashtag.
+     * @param object params
+     * @param cb callback that returns the tweet in string form
+     */
+    public async getRandomTweet(query: string): Promise<TweetData> {
+        // Parameters for query
+        const params = {
+            q: query,
+            result_type: "mixed",
+            lang: "en",
+            count: "50",
+            include_entities: "true",
+            tweet_mode: "extended",
+        };
+        return new Promise<TweetData> ((resolve, reject) => {
+            this.getTweets(params)
+            .then((data) => {
+                const randomIndex = Math.floor(Math.random() * (data.search_metadata.count - 1));
+                const rawTweet = data.statuses[randomIndex];
+                resolve(this.parseTweet(rawTweet));
+            })
+            .catch((err) => {
+                reject(err);
+            })
         });
     }
 
     /**
      * Get tweets from twitter given a provided hashtag.
+     * @returns array of tweets and the query used to find them.
      */
-    public async getMaterialByTweet(hashtags: string[], cb: (tweets: string[][]) => void): Promise<void> {
+    public async getMaterialByTweet(queries: string[]): Promise<TweetData[]> {
         const parmams = {
             q: "",
             result_type: "mixed",
@@ -42,90 +95,52 @@ export default class TwitterCore {
             include_entities: "true",
             tweet_mode: "extended",
         };
-        // Get responses for each hashtag
-        const rawdata: any[] = [];
-        await hashtags.forEach((tag) => {
-            parmams.q = tag;
-            this.getTweets(parmams, (data) => {
-                rawdata.push(data.statuses);
-                console.log(data);
+        return new Promise<TweetData[]>((resolve, reject) => {
+            const rawdata: any[] = [];
+            queries.forEach((tag) => {
+                parmams.q = tag;
+                this.getTweets(parmams)
+                .then((data) => {
+                    rawdata.push(data.statuses);
+                    console.log(data);
+                })
+                .catch((err) => {
+                    reject(err);
+                });
             });
-        });
-        console.log(hashtags);
-        console.log(rawdata);
-        const tweets: string[][] = [[]];
-        rawdata.forEach((data: any) => {
-            const query = data.search_metadata.query;
-            rawdata.forEach((rawtweet: any) => {
-                tweets.push([rawtweet.id_str, rawtweet.full_text, query]);
+            console.log(queries);
+            console.log(rawdata);
+            const tweets: string[][] = [[]];
+            rawdata.forEach((data: any) => {
+                const query = data.search_metadata.query;
+                rawdata.forEach((rawtweet: any) => {
+                    tweets.push([rawtweet.id_str, rawtweet.full_text, query]);
+                });
             });
+            resolve(tweets);
         });
-        cb(tweets);
     }
 
     /**
-     * Get top hashtags by WOEID found http://woeid.rosselliot.co.nz/
+     * Get top queries by WOEID found http://woeid.rosselliot.co.nz/
      * @param hashtag
      * @param cb
      */
-    public getTrendingHashtags(woeid: string, cb: (hashtags: string[]) => void): void {
+    public async getTrendingqueries(woeid: string): Promise<TwitterClient.ResponseData> {
         const params = {
             id: parseInt(woeid, 10),
         };
-        this.instance.get("trends/place", params, (error, data, response) => {
-            if (response.statusCode !== 200 || error) {
-                console.log(error);
-                cb(["Unable to find trending data for provided location."]);
-                return;
-            }
-            console.log(data);
-            const trends: any[] = data[0].trends;
-            let hashtags: string[] = ["Tag    :  Number of Tweets"];
-            trends.forEach((trend) => {
-                hashtags.push(`${trend.name}   |   ${trend.tweet_volume}`);
+        return new Promise<TwitterClient.ResponseData>((resolve, reject) => {
+            this.instance.get("trends/place", params, (error, data, response) => {
+                if (response.statusCode !== 200) {
+                    reject(error);
+                }
+                resolve(data);
             });
-            // Limit the number of results to 10
-            // TODO: figure out why some dont have a tweet_volume
-            hashtags = hashtags.slice(0, 10);
-            cb(hashtags);
         });
     }
 
     /**
-     * Get a random tweet from twitter with provided hashtag.
-     * @param object params
-     * @param cb callback that returns the tweet in string form
+     * 
      */
-    public getRandomTweet(hashtag: string, cb: (tweet: string, url: string, mediaUrl: string) => void): void {
-        // Parameters for query
-        const params = {
-            q: hashtag,
-            result_type: "mixed",
-            lang: "en",
-            count: "50",
-            include_entities: "true",
-            tweet_mode: "extended",
-        };
-        this.getTweets(params, (data: TwitterClient.ResponseData) => {
-            // Pick one out of all tweets received to display by random
-            const totalTweets: string[] = [];
-            data.statuses.forEach((e: string) => {
-                totalTweets.push(e);
-            });
-            const randomIndex = Math.floor(Math.random() * (totalTweets.length - 1));
-            if (data.statuses[randomIndex] === undefined) {
-                cb(`Unable to find tweet.`, "", "");
-            } else {
-                const tweet: string = data.statuses[randomIndex].full_text;
-                let mediaUrl: string;
-                try {
-                    mediaUrl = data.statuses[randomIndex].entities.media[0].media_url_https;
-                } catch (err) {
-                    mediaUrl = "";
-                }
-                cb(`${tweet}`, `https://twitter.com/user/status/${data.statuses[randomIndex].id_str}`, mediaUrl);
-            }
-        });
-    }
-
 }

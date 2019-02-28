@@ -1,4 +1,4 @@
-import Discord, { Message } from "discord.js";
+import Discord from "discord.js";
 
 import Core from "../cores/Core";
 import AbstractCommand from "./AbstractCommand";
@@ -16,7 +16,8 @@ export default class TrendingHashtags extends AbstractCommand {
      * @param args of argument.
      */
     public async called(core: Core, message: Discord.Message, args: string[]): Promise<void> {
-        await core.getTwitterManager().getTrendingHashtags(args[0], (hashtags: string[]) => {
+        await core.getTwitterManager().getTrendingHashtags(args[0])
+        .then((raw: any) => {
             let desc: string = "";
             hashtags.forEach((tag) => {
                 desc = desc.concat(`${tag}\n`);
