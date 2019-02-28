@@ -2,7 +2,6 @@ import Discord, { Message } from "discord.js";
 
 import Core from "../cores/Core";
 import AbstractCommand from "./AbstractCommand";
-import { TweetData } from "../cores/ITweetData";
 
 export default class RandomTweet extends AbstractCommand {
 
@@ -19,8 +18,8 @@ export default class RandomTweet extends AbstractCommand {
         await core.getTwitterManager().getRandomTweet(args.join(" "))
         .then((tweet) => {
             if (message.channel !== undefined) {
-                let embed = new Discord.RichEmbed();
-                embed.setTitle(`Selected tweet from query: ${args}`)
+                const embed = new Discord.RichEmbed();
+                embed.setTitle(`Selected tweet from query: ${args.join(" ")}`)
                 .setColor(0x00AE86)
                 .setDescription(tweet.text)
                 .setFooter(`Brought to you by the engineers at Dotma! (dotma.me)`)
@@ -31,7 +30,12 @@ export default class RandomTweet extends AbstractCommand {
                 }
                 message.channel.send(embed);
             }
+        })
+        .catch((err) => {
+            message.channel.send({embed: {
+                color: 0x00AE86,
+                description: `Error: ${err}`,
+            }});
         });
     }
-
 }

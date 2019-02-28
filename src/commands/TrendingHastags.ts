@@ -20,7 +20,7 @@ export default class TrendingHashtags extends AbstractCommand {
         // Call api through twitter core
         await core.getTwitterManager().getTrendingTags(args[0])
         .then((data: TwitterClient.ResponseData) => {
-            let desc: string = "";
+            let desc = "";
             const trends: any[] = data[0].trends;
             trends.forEach((trend: any) => {
                 desc = desc.concat(`${trend.name}\n`);
@@ -31,7 +31,10 @@ export default class TrendingHashtags extends AbstractCommand {
               }});
         })
         .catch((err) => {
-            console.error(err);
+            message.channel.send({embed: {
+                color: 3447003,
+                description: err,
+            }});
         })
     }
 }

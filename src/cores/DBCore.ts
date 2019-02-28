@@ -1,5 +1,8 @@
 import * as Sqlite from "sqlite";
 
+import { ITweetData } from "./ITweetData";
+import { throws } from "assert";
+
 /**
  * @classdesc Wrapper class around MySql Database Connection object.
  */
@@ -171,24 +174,20 @@ export default class DBCore {
      * Given a two dimensional array of strings with tweet_id, query and text,
      * import data into database.
      */
-    public storeTweets(data: string[][]): void {
-        let query = "INSERT INTO Trends (tweet_id, hashtag, text) VALUES";
-        const values: string[] = [];
+    public storeTweets(data: ITweetData[]): void {
+        const statement = this.connection.prepare("INSERT INTO Trends (tweet_id, hashtag, text) VALUES(?, ?, ?);");
         data.forEach((tweet) => {
-            query = query.concat(`(?, ?, ?),`);
-            values.push(tweet[0], tweet[1], tweet[2]);
+            statement.then((s) => {
+                s.run(tweet.id, tweet.query, tweet.text)
+                .catch((err) => {
+                    // Do nothing
+                })
+            })
+            .catch((err) => {
+                // Do nothing
+            });
         });
-        query.slice(query.length - 1);
-        query.concat(";");
-        console.log(query);
-        console.log(values);
-        this.connection.prepare(query)
-        .then((statement) => {
-            statement.run(values);
-        })
-        .catch((err) => {
-            console.log(err);
-        });
+        console.log("Finished material gathering job.");
     }
 
 }

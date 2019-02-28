@@ -4,10 +4,7 @@
   "description": "",
   "main": "Index.ts",
   "scripts": {
-    "start": "ts-node Index",
-    "asbuild:untouched": "asc assembly/index.ts -b build/untouched.wasm -t build/untouched.wat --sourceMap --validate --debug",
-    "asbuild:optimized": "asc assembly/index.ts -b build/optimized.wasm -t build/optimized.wat --sourceMap --validate --optimize",
-    "asbuild": "npm run asbuild:untouched && npm run asbuild:optimized"
+    "start": "ts-node Index"
   },
   "repository": {
     "type": "git",
@@ -20,12 +17,9 @@
   },
   "homepage": "https://github.com/thinc5/NPCbot#readme",
   "dependencies": {
-    "@types/discord-rpc": "^3.0.0",
     "@types/dotenv": "^6.1.0",
     "@types/node": "^10.12.24",
     "@types/twitter": "^1.7.0",
-    "assemblyscript": "github:Assemblyscript/assemblyscript",
-    "discord-rpc": "^3.0.1",
     "discord.js": "^11.4.2",
     "dotenv": "^6.2.0",
     "sqlite": "^3.0.2",

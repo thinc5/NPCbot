@@ -52,6 +52,10 @@ export default class Core {
      * Start the main processes of the bot.
      */
     public async start(): Promise<void> {
+        this.twitterCore.getMaterialByTweet(["kanye", "meetoo"])
+        .then((data) => {
+            this.databaseCore.storeTweets(data);
+        });
         this.bot.login(process.env.DISCORD_TOKEN)
         .catch((err) => {
             console.error(`Unable to login to discord, check tokens and .env variables. ${err}`);
