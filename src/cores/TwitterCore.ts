@@ -117,16 +117,16 @@ export default class TwitterCore {
                     tweets.push([rawtweet.id_str, rawtweet.full_text, query]);
                 });
             });
-            resolve(tweets);
+            resolve([]);
         });
     }
 
     /**
      * Get top queries by WOEID found http://woeid.rosselliot.co.nz/
-     * @param hashtag
-     * @param cb
+     * @param woeid
+     * @returns TwitterClient.ResponseData
      */
-    public async getTrendingqueries(woeid: string): Promise<TwitterClient.ResponseData> {
+    public async getTrendingTags(woeid: string): Promise<TwitterClient.ResponseData> {
         const params = {
             id: parseInt(woeid, 10),
         };
@@ -139,8 +139,4 @@ export default class TwitterCore {
             });
         });
     }
-
-    /**
-     * 
-     */
 }

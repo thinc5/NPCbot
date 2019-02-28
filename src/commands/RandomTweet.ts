@@ -16,7 +16,7 @@ export default class RandomTweet extends AbstractCommand {
      * @param args of argument.
      */
     public async called(core: Core, message: Discord.Message, args: string[]): Promise<void> {
-        await core.getTwitterManager().getRandomTweet(args.join())
+        await core.getTwitterManager().getRandomTweet(args.join(" "))
         .then((tweet) => {
             if (message.channel !== undefined) {
                 let embed = new Discord.RichEmbed();

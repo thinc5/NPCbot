@@ -1,4 +1,5 @@
 import Discord from "discord.js";
+import TwitterClient from "twitter";
 
 import Core from "../cores/Core";
 import AbstractCommand from "./AbstractCommand";
@@ -16,17 +17,21 @@ export default class TrendingHashtags extends AbstractCommand {
      * @param args of argument.
      */
     public async called(core: Core, message: Discord.Message, args: string[]): Promise<void> {
-        await core.getTwitterManager().getTrendingHashtags(args[0])
-        .then((raw: any) => {
+        // Call api through twitter core
+        await core.getTwitterManager().getTrendingTags(args[0])
+        .then((data: TwitterClient.ResponseData) => {
             let desc: string = "";
-            hashtags.forEach((tag) => {
-                desc = desc.concat(`${tag}\n`);
+            const trends: any[] = data[0].trends;
+            trends.forEach((trend: any) => {
+                desc = desc.concat(`${trend.name}\n`);
             });
             message.channel.send({embed: {
                 color: 3447003,
                 description: desc,
               }});
-        });
+        })
+        .catch((err) => {
+            console.error(err);
+        })
     }
-
 }
