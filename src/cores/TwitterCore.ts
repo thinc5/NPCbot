@@ -1,6 +1,6 @@
 import TwitterClient, { ResponseData } from "twitter";
-import { ITweetData } from "./ITweetData";
 
+import { ITweetData } from "./ITweetData";
 
 /**om "../NPCbot";
  * @classdesc A wrapper class around TwitterClient providing custom functionality.
@@ -89,7 +89,7 @@ export default class TwitterCore {
             })
             .catch((err) => {
                 reject(err);
-            })
+            });
         });
     }
 

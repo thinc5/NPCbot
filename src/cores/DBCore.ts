@@ -23,6 +23,7 @@ export default class DBCore {
         this.loadDb().then(() => {
             console.log("Database Manager connected.");
             // DEBUG FUNCTION: this.readDB();
+            this.retrieveTweets();
             this.updateRegisteredChannels()
             .catch((err) => {
                 console.error(err);
@@ -181,13 +182,41 @@ export default class DBCore {
                 s.run(tweet.id, tweet.query, tweet.text)
                 .catch((err) => {
                     // Do nothing
-                })
+                });
             })
             .catch((err) => {
                 // Do nothing
             });
         });
         console.log("Finished material gathering job.");
+    }
+
+    /**
+     * Given a two dimensional array of strings with tweet_id, query and text,
+     * import data into database.
+     */
+    public retrieveTweets(): void {
+        const statement = this.connection.all("SELECT text FROM Trends;")
+        .then((data) => {
+            console.log(data.join("\n"));
+        })
+        console.log(statement);
+    }
+
+    /**
+     * Forget all stored tweets.
+     */
+    public forgetTweets(): void {
+        const statement = this.connection.prepare("DELETE FROM Trends *");
+        statement.then((s) => {
+            s.run()
+            .catch((err) => {
+                console.error(err);
+            });
+        })
+        .catch((err) => {
+            console.error(err);
+        });
     }
 
 }
