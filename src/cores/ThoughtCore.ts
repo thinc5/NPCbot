@@ -106,9 +106,9 @@ export default class ThoughtCore {
             console.error(err);
         });
         let tweet: string = "";
-        const words: string[] = raw.join("\n").split(/[\s,]+/);
+        const words: string[] = (raw.join(" ")).split(" ");
         const start: string = words[Math.random() * (words.length - 1)];
-        console.log(start);
+        console.log(words + " selected: " + start);
         tweet = await quotes.start(start)
         .end(50)
         .process();
