@@ -1,5 +1,4 @@
-// @ts-ignore
-import * as MarkovChain from "markovchain";
+const Chain: any = require("markovchain");
 
 import Core from "./Core";
 
@@ -47,7 +46,7 @@ export default class ThoughtCore {
      * Private retrieval of unrelated materials.
      * TODO: Hardcoded for LA right now, will have it be customisable by server eventually.
      */
-    private async retrieveMaterial(): Promise<void> {
+    public async retrieveMaterial(): Promise<void> {
         let trends: string[] = [];
         await this.core.getTwitterManager().getTrendingTags("2442047")
         .then((tags) => {
@@ -72,7 +71,7 @@ export default class ThoughtCore {
     /**
      * Give current opinion and forget everything else.
      */
-    private giveOpinion(): void {
+    public giveOpinion(): void {
         // Get opinion.
         this.processMaterial();
         // Forget everything.
@@ -84,10 +83,15 @@ export default class ThoughtCore {
      */
     private processMaterial(): void {
         // Get stored tweets.
-        
-        const quotes = new MarkovChain();
-        const tweet = quotes.start().end(50).process();
-        return;
+        this.core.getDBCore().retrieveTweets()
+        .then((data) => {
+            const quotes = new Chain(data.join("\n"));
+            const tweet = quotes.start().end(50).process();
+            console.log(tweet);
+        })
+        .catch((err) => {
+            console.error(err);
+        });
     }
 
     /**

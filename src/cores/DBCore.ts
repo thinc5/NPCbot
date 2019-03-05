@@ -195,12 +195,24 @@ export default class DBCore {
      * Given a two dimensional array of strings with tweet_id, query and text,
      * import data into database.
      */
-    public retrieveTweets(): void {
-        const statement = this.connection.all("SELECT text FROM Trends;")
+    public async retrieveTweets(): Promise<string[]> {
+        const raw: string[] = [];
+        let error: any = undefined;
+        await this.connection.all("SELECT text FROM Trends;")
         .then((data) => {
-            console.log(data.join("\n"));
+            for (let obj of data) {
+                raw.push(obj.text);
+            }
         })
-        console.log(statement);
+        .catch((err) => {
+            error = err;
+        });
+        return new Promise<string[]>((resolve, reject) => {
+            if (error !== undefined) {
+                reject(error);
+            }
+            resolve(raw);
+        });
     }
 
     /**
