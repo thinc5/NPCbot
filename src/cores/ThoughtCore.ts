@@ -1,5 +1,7 @@
 const Chain: any = require("markovchain");
 
+import { Twitter } from "twitter";
+
 import Core from "./Core";
 
 /**
@@ -44,13 +46,18 @@ export default class ThoughtCore {
 
     /**
      * Private retrieval of unrelated materials.
-     * TODO: Hardcoded for LA right now, will have it be customisable by server eventually.
+     * TODO: Hard coded for LA right now, will have it be customizable by server eventually.
      */
     public async retrieveMaterial(): Promise<void> {
         let trends: string[] = [];
         await this.core.getTwitterManager().getTrendingTags("2442047")
-        .then((tags) => {
-            trends = tags.split(2);
+        .then((tags: Twitter.ResponseData) => {
+            let desc = "";
+            const rawTrends = tags[0].trends;
+            rawTrends.slice(0, 2);
+            rawTrends.forEach((trend: any) => {
+                trends.push(`${trend.name}`);
+            });
         })
         .catch((err) => {
             console.error(err);
