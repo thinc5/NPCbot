@@ -90,21 +90,21 @@ export default class ThoughtCore {
      */
     private async processMaterial(): Promise<void> {
         // Get stored tweets.
+        const quotes = new Chain();
         await this.core.getDBCore().retrieveTweets()
         .then((data) => {
-            const quotes = new Chain(data.join("\n"));
-            console.log(data.join("\n"));
-            const tweet = quotes.start((wordList: any) => {
-                const tempList = Object.keys(wordList);
-                return tempList[Math.random() * (tempList.length - 1)]
-            })
-            .end(50)
-            .process();
-            console.log(tweet);
+            quotes.parse(data.join("\n"));
         })
         .catch((err) => {
             console.error(err);
         });
+        // let tweet: string = "";
+        await console.log(quotes.start("Kanye").end(50).process());
+                // (wordList: any) => {
+                // const tempList = Object.keys(wordList);
+                // return tempList[Math.random() * (tempList.length - 1)];
+            //})
+            //console.log(tweet);
     }
 
     /**
