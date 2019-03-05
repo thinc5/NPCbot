@@ -88,11 +88,12 @@ export default class ThoughtCore {
     /**
      * Think time...
      */
-    private processMaterial(): void {
+    private async processMaterial(): Promise<void> {
         // Get stored tweets.
-        this.core.getDBCore().retrieveTweets()
+        await this.core.getDBCore().retrieveTweets()
         .then((data) => {
             const quotes = new Chain(data.join("\n"));
+            console.log(data.join("\n"));
             const tweet = quotes.start((wordList: any) => {
                 const tempList = Object.keys(wordList);
                 return tempList[Math.random() * (tempList.length - 1)]

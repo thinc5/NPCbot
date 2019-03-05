@@ -223,11 +223,11 @@ export default class DBCore {
         statement.then((s) => {
             s.run()
             .catch((err) => {
-                console.error(err);
+                console.error(`Error deleting trends: ${err}`);
             });
         })
         .catch((err) => {
-            console.error(err);
+            console.error(`Error deleting trends: ${err}`);
         });
     }
 
