@@ -96,18 +96,21 @@ export default class ThoughtCore {
     private async processMaterial(): Promise<string> {
         // Get stored tweets.
         const quotes = new Chain();
+        let raw: string[] = [];
         await this.core.getDBCore().retrieveTweets()
         .then((data) => {
+            raw = data;
             quotes.parse(data.join("\n"));
         })
         .catch((err) => {
             console.error(err);
         });
         let tweet: string = "";
-        tweet = await quotes.start((wordList: any) => {
-            const tempList = Object.keys(wordList);
-            return tempList[Math.random() * (tempList.length - 1)];
-        }).end(50)
+        const words: string[] = raw.join("\n").split(/[\s,]+/);
+        const start: string = words[Math.random() * (words.length - 1)];
+        console.log(start);
+        tweet = await quotes.start(start)
+        .end(50)
         .process();
         return new Promise<string>((resolve, reject) => {
             if (tweet === "") {
