@@ -1,3 +1,4 @@
+// @ts-ignore
 const Chain: any = require("markovchain");
 
 import TwitterClient from "twitter";
@@ -52,7 +53,6 @@ export default class ThoughtCore {
         let trends: string[] = [];
         await this.core.getTwitterManager().getTrendingTags("2442047")
         .then((tags: TwitterClient.ResponseData) => {
-            let desc = "";
             const rawTrends = tags[0].trends;
             rawTrends.slice(0, 2);
             rawTrends.forEach((trend: any) => {
@@ -80,6 +80,7 @@ export default class ThoughtCore {
      */
     public async giveOpinion(): Promise<void> {
         // Get opinion.
+        console.log(`Opinion: `);
         await this.processMaterial().then((tweet: string) => {
             console.log(tweet);
         })
@@ -105,18 +106,13 @@ export default class ThoughtCore {
         .catch((err) => {
             console.error(err);
         });
-        let tweet: string = "";
-        const words: string[] = (raw.join(" ")).split(" ");
-        const start: string = words[Math.random() * (words.length - 1)];
+        const words: string[] = (raw.join(" ").replace(/\n/g, "").replace(/"/g, "")).split(" ");
+        const index: number = Math.floor(Math.random() * (words.length - 1));
+        const start: string = words[index];
+        console.log(`Selected index: ${index} start string: ${start}`);
         console.log(words + " selected: " + start);
-        tweet = await quotes.start(start)
-        .end(50)
-        .process();
         return new Promise<string>((resolve, reject) => {
-            if (tweet === "") {
-                reject("Could not think :^(");
-            }
-            resolve(tweet);
+            resolve(quotes.start(start).end(50).process());
         });
     }
 

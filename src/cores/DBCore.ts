@@ -55,13 +55,13 @@ export default class DBCore {
                 .catch((err) => {
                     console.error(err);
                 });
-                // this.connection.migrate({
-                //     force: "last",
-                //     migrationsPath: "./src/migrations",
-                // })
-                // .catch((error) => {
-                //     console.error(`Unable to run migrations: ${error}`);
-                // });
+                this.connection.migrate({
+                    force: "last",
+                    migrationsPath: "./src/migrations",
+                })
+                .catch((error) => {
+                    console.error(`Unable to run migrations: ${error}`);
+                });
                 resolve();
             })
             .catch((error) => {

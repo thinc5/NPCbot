@@ -61,7 +61,13 @@ export default class Core {
             this.thoughtCore.start();
             this.thoughtCore.retrieveMaterial()
             .then(() => {
-                this.thoughtCore.giveOpinion();
+                this.thoughtCore.giveOpinion()
+                .then((tweet) => {
+                    console.log(tweet);
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
             });
         });
         this.bot.on("message", (message: Discord.Message) => {

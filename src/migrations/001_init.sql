@@ -1,3 +1,3 @@
 -- Up
-
+-- DELETE FROM Trends
 -- Down
