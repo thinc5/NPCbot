@@ -98,13 +98,12 @@ export default class ThoughtCore {
         .catch((err) => {
             console.error(err);
         });
-        // let tweet: string = "";
-        await console.log(quotes.start("Kanye").end(50).process());
-                // (wordList: any) => {
-                // const tempList = Object.keys(wordList);
-                // return tempList[Math.random() * (tempList.length - 1)];
-            //})
-            //console.log(tweet);
+        const tweet: string =  await quotes.start((wordList: any) => {
+            const tempList = Object.keys(wordList);
+            return tempList[Math.random() * (tempList.length - 1)];
+        }).end(50)
+        .process();
+        console.log(tweet);
     }
 
     /**
