@@ -219,7 +219,7 @@ export default class DBCore {
      * Forget all stored tweets.
      */
     public forgetTweets(): void {
-        const statement = this.connection.prepare("DELETE * FROM Trends");
+        const statement = this.connection.prepare("DELETE FROM Trends");
         statement.then((s) => {
             s.run()
             .catch((err) => {

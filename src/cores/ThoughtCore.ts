@@ -78,9 +78,14 @@ export default class ThoughtCore {
     /**
      * Give current opinion and forget everything else.
      */
-    public giveOpinion(): void {
+    public async giveOpinion(): Promise<void> {
         // Get opinion.
-        this.processMaterial();
+        await this.processMaterial().then((tweet: string) => {
+            console.log(tweet);
+        })
+        .catch((err) => {
+            console.error(err);
+        });
         // Forget everything.
         this.core.getDBCore().forgetTweets();
     }
@@ -107,7 +112,6 @@ export default class ThoughtCore {
         return new Promise<string>((resolve, reject) => {
             if (tweet === "") {
                 reject("Could not think :^(");
-                console.log(tweet);
             }
             resolve(tweet);
         });
