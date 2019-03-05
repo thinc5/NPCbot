@@ -93,7 +93,12 @@ export default class ThoughtCore {
         this.core.getDBCore().retrieveTweets()
         .then((data) => {
             const quotes = new Chain(data.join("\n"));
-            const tweet = quotes.start().end(50).process();
+            const tweet = quotes.start((wordList: any) => {
+                const tempList = Object.keys(wordList);
+                return tempList[Math.random() * (tempList.length - 1)]
+            })
+            .end(50)
+            .process();
             console.log(tweet);
         })
         .catch((err) => {
