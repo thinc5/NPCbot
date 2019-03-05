@@ -88,7 +88,7 @@ export default class ThoughtCore {
     /**
      * Think time...
      */
-    private async processMaterial(): Promise<void> {
+    private async processMaterial(): Promise<string> {
         // Get stored tweets.
         const quotes = new Chain();
         await this.core.getDBCore().retrieveTweets()
@@ -98,12 +98,19 @@ export default class ThoughtCore {
         .catch((err) => {
             console.error(err);
         });
-        const tweet: string =  await quotes.start((wordList: any) => {
+        let tweet: string = "";
+        tweet = await quotes.start((wordList: any) => {
             const tempList = Object.keys(wordList);
             return tempList[Math.random() * (tempList.length - 1)];
         }).end(50)
         .process();
-        console.log(tweet);
+        return new Promise<string>((resolve, reject) => {
+            if (tweet === "") {
+                reject("Could not think :^(");
+                console.log(tweet);
+            }
+            resolve(tweet);
+        });
     }
 
     /**
