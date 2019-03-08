@@ -3,7 +3,7 @@
  * @classdesc Basic Registry implementation for storing any type.
  */
 export default abstract class AbstractRegistry<T> {
-  
+
     protected registry: Map<string, T>;
 
     public constructor() {

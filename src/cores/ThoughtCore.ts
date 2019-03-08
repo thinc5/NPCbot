@@ -1,5 +1,5 @@
 // @ts-ignore
-const Chain: any = require("markovchain");
+import * as Chain from "markovchain";
 
 import TwitterClient from "twitter";
 
@@ -50,7 +50,7 @@ export default class ThoughtCore {
      * TODO: Hard coded for LA right now, will have it be customizable by server eventually.
      */
     public async retrieveMaterial(): Promise<void> {
-        let trends: string[] = [];
+        const trends: string[] = [];
         await this.core.getTwitterManager().getTrendingTags("2442047")
         .then((tags: TwitterClient.ResponseData) => {
             const rawTrends = tags[0].trends;
@@ -80,14 +80,8 @@ export default class ThoughtCore {
      */
     public async giveOpinion(): Promise<void> {
         // Get opinion.
-        console.log(`Opinion: `);
-        await this.processMaterial().then((tweet: string) => {
-            console.log(tweet);
-        })
-        .catch((err) => {
-            console.error(err);
-        });
-        // Forget everything.
+        console.log(await this.processMaterial());
+        // Clear the database
         this.core.getDBCore().forgetTweets();
     }
 
@@ -97,23 +91,13 @@ export default class ThoughtCore {
     private async processMaterial(): Promise<string> {
         // Get stored tweets.
         const quotes = new Chain();
-        let raw: string[] = [];
-        await this.core.getDBCore().retrieveTweets()
-        .then((data) => {
-            raw = data;
-            quotes.parse(data.join("\n"));
-        })
-        .catch((err) => {
-            console.error(err);
-        });
+        const raw: string[] = await this.core.getDBCore().retrieveTweets();
         const words: string[] = (raw.join(" ").replace(/\n/g, "").replace(/"/g, "")).split(" ");
         const index: number = Math.floor(Math.random() * (words.length - 1));
         const start: string = words[index];
         console.log(`Selected index: ${index} start string: ${start}`);
         console.log(words + " selected: " + start);
-        return new Promise<string>((resolve, reject) => {
-            resolve(quotes.start(start).end(50).process());
-        });
+        return quotes.start(start).end(50).process(); // = resolve(quotes.start(start).end(50).process())
     }
 
     /**

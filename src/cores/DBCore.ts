@@ -197,10 +197,10 @@ export default class DBCore {
      */
     public async retrieveTweets(): Promise<string[]> {
         const raw: string[] = [];
-        let error: any = undefined;
+        let error: any;
         await this.connection.all("SELECT text FROM Trends;")
         .then((data) => {
-            for (let obj of data) {
+            for (const obj of data) {
                 raw.push(obj.text);
             }
         })
