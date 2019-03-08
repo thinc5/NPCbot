@@ -1,5 +1,5 @@
 // @ts-ignore
-import * as Chain from "markovchain";
+import { MarkovChain as Chain } from "markovchain";
 
 import TwitterClient from "twitter";
 
@@ -51,7 +51,7 @@ export default class ThoughtCore {
      */
     public async retrieveMaterial(): Promise<void> {
         const trends: string[] = [];
-        await this.core.getTwitterManager().getTrendingTags("2442047")
+        this.core.getTwitterManager().getTrendingTags("2442047")
         .then((tags: TwitterClient.ResponseData) => {
             const rawTrends = tags[0].trends;
             rawTrends.slice(0, 2);
@@ -66,7 +66,7 @@ export default class ThoughtCore {
             console.error("Failed to gather trends.");
             return;
         }
-        await this.core.getTwitterManager().getMaterialByTweet(trends)
+        this.core.getTwitterManager().getMaterialByTweet(trends)
         .then((data) => {
             this.core.getDBCore().storeTweets(data);
         })
