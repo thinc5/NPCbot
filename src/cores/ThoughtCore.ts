@@ -1,5 +1,5 @@
 // @ts-ignore
-import { MarkovChain as Chain } from "markovchain";
+const Chain = require("markovchain");
 
 import TwitterClient from "twitter";
 
