@@ -59,16 +59,9 @@ export default class Core {
         this.bot.on("ready", async () => {
             console.log(`${this.bot.user.username} is online!`);
             this.thoughtCore.start();
-            this.thoughtCore.retrieveMaterial()
-            .then(() => {
-                this.thoughtCore.giveOpinion()
-                .then((tweet) => {
-                    console.log(tweet);
-                })
-                .catch((err) => {
-                    console.log(err);
-                });
-            });
+            // Testing of the markov chain functionality
+            await this.thoughtCore.retrieveMaterial();
+            this.thoughtCore.giveOpinion();
         });
         this.bot.on("message", (message: Discord.Message) => {
             // Check message isn't empty

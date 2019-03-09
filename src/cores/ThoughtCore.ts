@@ -1,9 +1,11 @@
 // @ts-ignore
 const Chain = require("markovchain");
 
+import Discord, { DMChannel, TextChannel } from "discord.js";
 import TwitterClient from "twitter";
 
 import Core from "./Core";
+import { ITweetData } from "./ITweetData";
 
 /**
  * @classdesc Facilitates original thought :^)
@@ -20,9 +22,15 @@ export default class ThoughtCore {
      */
     private progress: number;
 
+    /**
+     * Interval at which the bot lets its thoughts be known.
+     */
+    private interval: number;
+
     public constructor(core: Core) {
         this.core = core;
-        this.progress = 55;
+        this.progress = 0;
+        this.interval = 1000 * 60 * parseInt(process.env.UPDATE_INTERVAL_MINS as string, 10);
     }
 
     /**
@@ -31,18 +39,22 @@ export default class ThoughtCore {
     public start(): void {
         // Status and avatar updates
         setInterval(() => {
+            this.progress++;
+        }, this.interval / 100);
+        setInterval(() => {
             this.progressUpdate();
         }, 1000 * 4);   // Only update every 4 seconds.
         setInterval(() => {
             this.avatarUpdate();
         }, (1000 * 60 * 30)); // Only update every 30 minutes.
         // Thinking updates every four hours
-        setInterval(() => { // Update DB every four hours.
+        setInterval(() => {
             this.retrieveMaterial();
-        }, (1000 * 60 * 60 * 4));
+        }, (this.interval / 6));
         setInterval(() => {
             this.giveOpinion();
-        }, (1000 * 60 * 60 * 24));
+            this.progress = 0;
+        }, (this.interval));
     }
 
     /**
@@ -50,29 +62,22 @@ export default class ThoughtCore {
      * TODO: Hard coded for LA right now, will have it be customizable by server eventually.
      */
     public async retrieveMaterial(): Promise<void> {
-        const trends: string[] = [];
-        this.core.getTwitterManager().getTrendingTags("2442047")
-        .then((tags: TwitterClient.ResponseData) => {
-            const rawTrends = tags[0].trends;
-            rawTrends.slice(0, 2);
+        try {
+            const trends: string[] = [];
+            const results: TwitterClient.ResponseData = await this.core.getTwitterManager().getTrendingTags("2442047");
+            const rawTrends = (results[0].trends).slice(0, parseInt(process.env.NUMBER_OF_HASHTAGS as string, 10));
             rawTrends.forEach((trend: any) => {
                 trends.push(`${trend.name}`);
             });
-        })
-        .catch((err) => {
+            if (trends === []) {
+                console.error("Failed to gather trends.");
+                return;
+            }
+            const data: ITweetData[] = await this.core.getTwitterManager().getMaterialByTweet(trends);
+            await this.core.getDBCore().storeTweets(data);
+        } catch (err) {
             console.error(err);
-        });
-        if (trends === []) {
-            console.error("Failed to gather trends.");
-            return;
         }
-        this.core.getTwitterManager().getMaterialByTweet(trends)
-        .then((data) => {
-            this.core.getDBCore().storeTweets(data);
-        })
-        .catch((err) => {
-            console.error(err);
-        });
     }
 
     /**
@@ -80,9 +85,18 @@ export default class ThoughtCore {
      */
     public async giveOpinion(): Promise<void> {
         // Get opinion.
-        console.log(await this.processMaterial());
+        const tweet = await this.processMaterial();
+        // Let all registered channels know.
+        const targets: string[] = this.core.getDBCore().getRegisteredChannels();
+        for (const target of targets) {
+            const channel: Discord.Channel | undefined = this.core.getBot().channels.get(target);
+            if (channel !== undefined && channel.type === "text") {
+                const dm = channel as Discord.TextChannel;
+                dm.send(tweet);
+            }
+        }
         // Clear the database
-        this.core.getDBCore().forgetTweets();
+        await this.core.getDBCore().forgetTweets();
     }
 
     /**
@@ -90,14 +104,15 @@ export default class ThoughtCore {
      */
     private async processMaterial(): Promise<string> {
         // Get stored tweets.
-        const quotes = new Chain();
         const raw: string[] = await this.core.getDBCore().retrieveTweets();
+        // Remove all newlines, and quotes.
         const words: string[] = (raw.join(" ").replace(/\n/g, "").replace(/"/g, "")).split(" ");
+        // Get the starting word of the tweet to getnerate.
         const index: number = Math.floor(Math.random() * (words.length - 1));
         const start: string = words[index];
-        console.log(`Selected index: ${index} start string: ${start}`);
-        console.log(words + " selected: " + start);
-        return quotes.start(start).end(50).process(); // = resolve(quotes.start(start).end(50).process())
+        // Instantiate the markov chain and parse the total words as a stirng.
+        const quotes = new Chain(words.join(" "));
+        return quotes.start(start).end(50).process();
     }
 
     /**
@@ -118,14 +133,16 @@ export default class ThoughtCore {
      * Update bots avatar based off status.
      */
     private avatarUpdate(): void {
-        if (this.progress < 50) {
-            this.core.updateAvatar("res/main.png");
-        } else if (this.progress < 60) {
+        if (this.progress < 35) {
+            this.core.updateAvatar("res/main.jpg");
+        } else if (this.progress < 50) {
             this.core.updateAvatar("res/soy.png");
-        } else if (this.progress < 80) {
+        } else if (this.progress < 75) {
+            this.core.updateAvatar("res/angry.png");
+        } else if (this.progress < 85) {
             this.core.updateAvatar("res/smug.png");
         } else {
-            this.core.updateAvatar("res/angry.png");
+            this.core.updateAvatar("res/really_mad.jpg");
         }
     }
 

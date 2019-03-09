@@ -4,7 +4,7 @@ import { ITweetData } from "./ITweetData";
 import { throws } from "assert";
 
 /**
- * @classdesc Wrapper class around MySql Database Connection object.
+ * @classdesc Wrapper class around Sqlite Database Connection object.
  */
 export default class DBCore {
 
@@ -197,22 +197,11 @@ export default class DBCore {
      */
     public async retrieveTweets(): Promise<string[]> {
         const raw: string[] = [];
-        let error: any;
-        await this.connection.all("SELECT text FROM Trends;")
-        .then((data) => {
-            for (const obj of data) {
-                raw.push(obj.text);
-            }
-        })
-        .catch((err) => {
-            error = err;
-        });
-        return new Promise<string[]>((resolve, reject) => {
-            if (error !== undefined) {
-                reject(error);
-            }
-            resolve(raw);
-        });
+        const data = await this.connection.all("SELECT text FROM Trends;");
+        for (const obj of data) {
+            raw.push(obj.text);
+        }
+        return raw;
     }
 
     /**

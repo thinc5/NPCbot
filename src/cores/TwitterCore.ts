@@ -109,12 +109,10 @@ export default class TwitterCore {
         const tweets: ITweetData[] = [];
         for (const tag of queries) {
             parmams.q = tag;
-            await this.getTweets(parmams)
-            .then((data) => {
-                for (const tweet of data.statuses) {
-                    tweets.push(this.parseTweet(tweet, data.search_metadata.query));
-                }
-            });
+            const data = await this.getTweets(parmams);
+            for (const tweet of data.statuses) {
+                tweets.push(this.parseTweet(tweet, data.search_metadata.query));
+            }
         }
         return new Promise<ITweetData[]>((resolve, reject) => {
             resolve(tweets);
