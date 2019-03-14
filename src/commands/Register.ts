@@ -10,7 +10,7 @@ export default class Register extends AbstractCommand {
     }
 
     /**
-     * Register a channel to NPCbot
+     * Register a channel to receive thoughts from the bot.
      * @param channelId to send response to.
      * @param args of argument.
      */

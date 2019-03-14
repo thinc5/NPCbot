@@ -92,7 +92,14 @@ export default class ThoughtCore {
             const channel: Discord.Channel | undefined = this.core.getBot().channels.get(target);
             if (channel !== undefined && channel.type === "text") {
                 const dm = channel as Discord.TextChannel;
-                dm.send(tweet);
+                const embed: Discord.RichEmbed = new Discord.RichEmbed();
+                embed.setTitle(`This is my unique opinion: `)
+                .setColor(0x00AE86)
+                .setDescription(tweet)
+                .setFooter(`Brought to you by the engineers at Dotma! (dotma.me)`)
+                .setTimestamp()
+                .setURL("https://www.dotma.me");
+                dm.send(embed);
             }
         }
         // Clear the database

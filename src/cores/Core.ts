@@ -37,7 +37,7 @@ export default class Core {
     private thoughtCore: ThoughtCore;
 
     /**
-     * @classdesc Core of NPC bot.
+     * @classdesc Core of the bot.
      */
     public constructor() {
         Dotenv.config();

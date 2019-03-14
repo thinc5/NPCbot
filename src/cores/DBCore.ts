@@ -118,7 +118,7 @@ export default class DBCore {
     }
 
     /**
-     * Register channel to NPCbot's db.
+     * Register channel in db.
      * @param channel_id
      */
     public async registerChannel(channelID: string): Promise<string> {
@@ -137,7 +137,7 @@ export default class DBCore {
     }
 
     /**
-     * Unregister channel to NPCbot's db if channel exists.
+     * Unregister channel from db if channel exists.
      * @param channel_id
      */
     public async unregisterChannel(channelID: string): Promise<string> {
