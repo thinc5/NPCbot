@@ -1,6 +1,6 @@
 import * as Sqlite from "sqlite";
 
-import { ITweetData } from "./ITweetData";
+import { ITweetData } from "../../types/ITweetData";
 import { throws } from "assert";
 
 /**

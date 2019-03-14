@@ -5,7 +5,7 @@ import Discord, { DMChannel, TextChannel } from "discord.js";
 import TwitterClient from "twitter";
 
 import Core from "./Core";
-import { ITweetData } from "./ITweetData";
+import { ITweetData } from "../../types/ITweetData";
 
 /**
  * @classdesc Facilitates original thought :^)
