@@ -140,16 +140,18 @@ export default class ThoughtCore {
      * Update bots avatar based off status.
      */
     private avatarUpdate(): void {
-        if (this.progress < 35) {
-            this.core.updateAvatar("res/main.jpg");
-        } else if (this.progress < 50) {
-            this.core.updateAvatar("res/soy.png");
+        if (this.progress < 15) {
+            this.core.updateAvatar("res/thinking.png");
+        } else if (this.progress < 30) {
+            this.core.updateAvatar("res/sonk.png");
+        } else if (this.progress < 45) {
+            this.core.updateAvatar("res/thinkeye.png");
+        } else if (this.progress < 60) {
+            this.core.updateAvatar("res/megathink.png");
         } else if (this.progress < 75) {
-            this.core.updateAvatar("res/angry.png");
-        } else if (this.progress < 85) {
-            this.core.updateAvatar("res/smug.png");
+            this.core.updateAvatar("res/thinksweat.png");
         } else {
-            this.core.updateAvatar("res/really_mad.jpg");
+            this.core.updateAvatar("res/thinkjoi.png");
         }
     }
 
