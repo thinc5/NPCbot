@@ -17,17 +17,17 @@
   },
   "homepage": "https://github.com/thinc5/NPCbot#readme",
   "dependencies": {
-    "@types/dotenv": "^6.1.0",
-    "@types/node": "^10.12.24",
+    "@types/dotenv": "^6.1.1",
+    "@types/node": "^10.17.26",
     "@types/twitter": "^1.7.0",
-    "async": "^2.6.2",
+    "async": "^2.6.3",
     "callback": "0.0.1",
-    "discord.js": "^11.4.2",
+    "discord.js": "^11.6.4",
     "dotenv": "^6.2.0",
     "markovchain": "^1.0.2",
     "sqlite": "^3.0.2",
-    "ts-node": "^8.0.2",
+    "ts-node": "^8.10.2",
     "twitter": "^1.7.1",
-    "typescript": "^3.3.3"
+    "typescript": "^3.9.5"
   }
 }

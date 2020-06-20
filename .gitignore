@@ -1,8 +1,10 @@
 #Private environment variables
-*.env
+.env
 
 #Dependencies
 node_modules/
 
 #🤣🤣🤣
 **.js
+
+*.db
