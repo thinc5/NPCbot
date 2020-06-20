@@ -35,6 +35,7 @@ export default class ThoughtCore {
 
     /**
      * Start thinking when core is ready.
+     * TODO: Change to be crons running on UTC.
      */
     public start(): void {
         // Status and avatar updates
@@ -132,7 +133,7 @@ export default class ThoughtCore {
         bar = base.substr(0, bars) + bar.substr(bars);
         this.core.updateActivity(`[${bar}] ${this.progress}%`);
         setTimeout(() => {
-            this.core.updateActivity(`% help`);
+            this.core.updateActivity(`${process.env.COMMAND_PREFIX} help`);
         }, 2000);
     }
 

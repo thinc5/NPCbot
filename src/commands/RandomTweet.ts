@@ -6,7 +6,7 @@ import AbstractCommand from "./AbstractCommand";
 export default class RandomTweet extends AbstractCommand {
 
     public constructor() {
-        super("randomtweet", "Request a random tweet related to the provided query", "% randomtweet [query]", -1);
+        super("randomtweet", "Request a random tweet related to the provided query", `${process.env.COMMAND_PREFIX} randomtweet [query]`, -1);
     }
 
     /**

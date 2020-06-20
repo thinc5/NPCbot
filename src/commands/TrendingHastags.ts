@@ -8,7 +8,7 @@ export default class TrendingHashtags extends AbstractCommand {
 
     public constructor() {
         super("trendinghashtags", "Get the trending tweets in a provided woeid"
-        + "(can be found at http://woeid.rosselliot.co.nz/)", "% trendinghashtags [woeid]", 1);
+        + "(can be found at http://woeid.rosselliot.co.nz/)", `${process.env.COMMAND_PREFIX} trendinghashtags [woeid]`, 1);
     }
 
     /**

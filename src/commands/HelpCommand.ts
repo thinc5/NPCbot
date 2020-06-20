@@ -6,7 +6,7 @@ import Core from "../cores/Core";
 export default class Help extends AbstractCommand {
 
     public constructor() {
-        super("help", "Displays commands", "% help", 0);
+        super("help", "Displays commands", `${process.env.COMMAND_PREFIX} help`, 0);
     }
 
     /**
