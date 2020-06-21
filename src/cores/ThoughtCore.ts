@@ -35,7 +35,9 @@ export default class ThoughtCore {
     public start(): void {
         // Status and avatar updates this.interval / 100
         new CronJob("*/14 * * * *", () => {
-            this.progress++;
+            if (this.progress < 100) {
+                this.progress++;
+            }
         }, null, true, 'Australia/Brisbane');
         // Cant specify seconds in cron so we use an interval here.
         setInterval(() => {
@@ -47,7 +49,7 @@ export default class ThoughtCore {
         new CronJob('0 */4 * * *', () => {
             this.retrieveMaterial();
         }, null, true, 'Australia/Brisbane', null, true);
-        new CronJob("0 0 * * *", () => {
+        new CronJob("0 11 * * *", () => {
             this.giveOpinion();
             this.progress = 0;
         }, null, true, 'Australia/Brisbane', null, false);
