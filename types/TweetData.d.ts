@@ -1,7 +1,7 @@
 /**
  * The fields of tweet data we care about.
  */
-export interface ITweetData {
+export interface TweetData {
     id: string;
     url: string;
     text: string;

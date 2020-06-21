@@ -3,9 +3,10 @@ const Chain = require("markovchain");
 
 import Discord, { DMChannel, TextChannel } from "discord.js";
 import TwitterClient from "twitter";
+import { CronJob }  from "cron";
 
 import Core from "./Core";
-import { ITweetData } from "../../types/ITweetData";
+import { TweetData } from "../../types/TweetData";
 
 /**
  * @classdesc Facilitates original thought :^)
@@ -22,15 +23,9 @@ export default class ThoughtCore {
      */
     private progress: number;
 
-    /**
-     * Interval at which the bot lets its thoughts be known.
-     */
-    private interval: number;
-
     public constructor(core: Core) {
         this.core = core;
         this.progress = 0;
-        this.interval = 1000 * 60 * parseInt(process.env.UPDATE_INTERVAL_MINS as string, 10);
     }
 
     /**
@@ -38,24 +33,24 @@ export default class ThoughtCore {
      * TODO: Change to be crons running on UTC.
      */
     public start(): void {
-        // Status and avatar updates
-        setInterval(() => {
+        // Status and avatar updates this.interval / 100
+        new CronJob("*/14 * * * *", () => {
             this.progress++;
-        }, this.interval / 100);
+        }, null, true, 'Australia/Brisbane');
+        // Cant specify seconds in cron so we use an interval here.
         setInterval(() => {
             this.progressUpdate();
-        }, 1000 * 4);   // Only update every 4 seconds.
-        setInterval(() => {
+        }, 5000);
+        new CronJob('30 * * * *', () => {
             this.avatarUpdate();
-        }, (1000 * 60 * 30)); // Only update every 30 minutes.
-        // Thinking updates every four hours
-        setInterval(() => {
+        }, null, true, 'Australia/Brisbane');
+        new CronJob('0 */4 * * *', () => {
             this.retrieveMaterial();
-        }, (this.interval / 6));
-        setInterval(() => {
+        }, null, true, 'Australia/Brisbane', null, true);
+        new CronJob("0 0 * * *", () => {
             this.giveOpinion();
             this.progress = 0;
-        }, (this.interval));
+        }, null, true, 'Australia/Brisbane', null, false);
     }
 
     /**
@@ -74,7 +69,7 @@ export default class ThoughtCore {
                 console.error("Failed to gather trends.");
                 return;
             }
-            const data: ITweetData[] = await this.core.getTwitterManager().getMaterialByTweet(trends);
+            const data: TweetData[] = await this.core.getTwitterManager().getMaterialByTweet(trends);
             await this.core.getDBCore().storeTweets(data);
         } catch (err) {
             console.error(err);
@@ -88,7 +83,7 @@ export default class ThoughtCore {
         // Get opinion.
         const tweet = await this.processMaterial();
         // Let all registered channels know.
-        const targets: string[] = this.core.getDBCore().getRegisteredChannels();
+        const targets: string[] = await this.core.getDBCore().getRegisteredChannels();
         for (const target of targets) {
             const channel: Discord.Channel | undefined = this.core.getBot().channels.get(target);
             if (channel !== undefined && channel.type === "text") {
@@ -115,10 +110,10 @@ export default class ThoughtCore {
         const raw: string[] = await this.core.getDBCore().retrieveTweets();
         // Remove all newlines, and quotes.
         const words: string[] = (raw.join(" ").replace(/\n/g, "").replace(/"/g, "")).split(" ");
-        // Get the starting word of the tweet to getnerate.
+        // Get the starting word of the tweet to generate.
         const index: number = Math.floor(Math.random() * (words.length - 1));
         const start: string = words[index];
-        // Instantiate the markov chain and parse the total words as a stirng.
+        // Instantiate the markov chain and parse the total words as a string.
         const quotes = new Chain(words.join(" "));
         return quotes.start(start).end(50).process();
     }

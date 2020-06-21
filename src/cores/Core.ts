@@ -53,15 +53,12 @@ export default class Core {
      */
     public async start(): Promise<void> {
         this.bot.login(process.env.DISCORD_TOKEN)
-        .catch((err) => {
+        .catch((err: any) => {
             console.error(`Unable to login to discord, check tokens and .env variables. ${err}`);
         });
         this.bot.on("ready", async () => {
             console.log(`${this.bot.user.username} is online!`);
             this.thoughtCore.start();
-            // Testing of the markov chain functionality
-            await this.thoughtCore.retrieveMaterial();
-            this.thoughtCore.giveOpinion();
         });
         this.bot.on("message", (message: Discord.Message) => {
             // Check message isn't empty
@@ -117,7 +114,7 @@ export default class Core {
      */
     public updateAvatar(filepath: string): void {
         this.bot.user.setAvatar(filepath)
-        .catch((err) => {
+        .catch((err: any) => {
             console.error(err);
         });
     }

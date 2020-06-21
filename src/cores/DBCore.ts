@@ -1,223 +1,167 @@
-import * as Sqlite from "sqlite";
+import { Sequelize } from "sequelize";
 
-import { ITweetData } from "../../types/ITweetData";
-import { throws } from "assert";
+import { TweetData } from "../../types/TweetData";
+
+import { defineRegisteredChannels } from "../models/RegisteredChannels";
+import { defineTrends } from "../models/Trends";
 
 /**
- * @classdesc Wrapper class around Sqlite Database Connection object.
+ * @classdesc Wrapper class around Sequelize.
  */
 export default class DBCore {
 
     /**
      * Database connection.
      */
-    private connection!: Sqlite.Database;
-
-    /**
-     * Cache of registered Channels.
-     */
-    private registeredChannels: string[];
+    private connection: Sequelize;
 
     public constructor() {
-        this.registeredChannels = [];
-        this.loadDb().then(() => {
-            console.log("Database Manager connected.");
-            // DEBUG FUNCTION: this.readDB();
-            this.retrieveTweets();
-            this.updateRegisteredChannels()
-            .catch((err) => {
-                console.error(err);
-            });
-        }).catch((err) => {
-            console.error(`Unable to load database: ${err}`);
-        });
+        // Connect to the database.
+        this.connection = new Sequelize(process.env.DB_NAME as string,
+            process.env.DB_USER as string,
+            process.env.DB_PASSWORD as string,
+            {
+                host: process.env.DB_HOST,
+                dialect: process.env.DB_DIALECT as any,
+                logging: false
+            }
+        );
+        // Define models.
+        defineRegisteredChannels(this.connection);
+        defineTrends(this.connection);
+        // Force model sync.
+        this.connection.sync({ force: false });
+        console.log("Database Manager connected.");
     }
 
-    /**
-     * Load database from file or create if it does not exist or cannot be found.
-     */
-    private async loadDb(): Promise<void> {
-        return new Promise((resolve, reject) => {
-            const dbPromise = Sqlite.open(process.env.DB_LOCATION as string, {
-                //     Open r+w    If does not exist create
-                mode: 0x00000002 | 0x00000004,
-            });
-            // Resolve promise
-            dbPromise.then((db) => {
-                this.connection = db;
-                this.connection.exec(
-                    `CREATE TABLE IF NOT EXISTS RegisteredChannels (channel_id TEXT PRIMARY KEY);`)
-                .catch((err) => {
-                    console.error(err);
-                });
-                this.connection.exec(
-                    `CREATE TABLE IF NOT EXISTS Trends (tweet_id TEXT PRIMARY KEY, hashtag TEXT NOT NULL, text TEXT NOT NULL);`)
-                .catch((err) => {
-                    console.error(err);
-                });
-                this.connection.migrate({
-                    force: "last",
-                    migrationsPath: "./src/migrations",
-                })
-                .catch((error) => {
-                    console.error(`Unable to run migrations: ${error}`);
-                });
-                resolve();
-            })
-            .catch((error) => {
-                console.error(`Unable to open database: ${error}`);
-                reject(error);
-            });
-        });
-    }
-
-    /**
-     * Debug function to show all registered channels.
-     * @param query SQL query to be "executed".
-     */
-    public async readDB(): Promise<void> {
-        if (this.connection == undefined) {
-            console.error("Database connection closed.");
-        }
-        this.connection.all(`SELECT * FROM RegisteredChannels`)
-        .then((rows) => {
-            console.log(rows);
-        })
-        .catch((error) => {
-            console.error(`Unable to read from database, check it exists. ${error}`);
-        });
+    public getConnection(): Sequelize {
+        return this.connection;
     }
 
     /**
      * Returns array of registered channels.
      */
-    public getRegisteredChannels(): string[] {
-        return this.registeredChannels;
-    }
-
-    /**
-     * Retrieves list of registered channel ids.
-     */
-    public async updateRegisteredChannels(): Promise<any[]> {
-        return new Promise<any[]>((resolve, reject) => {
-            if (this.connection == undefined) {
-                reject("Database connection closed.");
+    public async getRegisteredChannels(): Promise<string[]> {
+        const raw = await this.connection.models.RegisteredChannels.findAll();
+        const clean = raw.map((row: any) => {
+            if (row.dataValues.channel_id) {
+                return row.dataValues.channel_id;
             }
-            this.connection.all(`SELECT channel_id FROM RegisteredChannels`)
-            .then((rows) => {
-                this.registeredChannels = [];
-                rows.forEach((id) => {
-                    this.registeredChannels.push(id.channel_id);
-                });
-                resolve(rows);
-            })
-            .catch((err) => {
-                reject(err);
-            });
-        });
+        })
+        return clean;
     }
 
     /**
      * Register channel in db.
      * @param channel_id
      */
-    public async registerChannel(channelID: string): Promise<string> {
-        return new Promise<string>((resolve, reject) => {
-            // If this already exists ignore request.
-            const targetIndex: number = this.registeredChannels.indexOf(channelID);
-            if (targetIndex !== -1) {
-                reject(new Error("already registered"));
-            }
-            this.registeredChannels.push(channelID);
-            this.connection.run(`INSERT INTO RegisteredChannels(channel_id)`
-            + ` SELECT ${channelID} WHERE NOT EXISTS(SELECT 1 FROM RegisteredChannels`
-            + ` WHERE channel_id = ${channelID});`);
-            resolve();
-        });
+    public async registerChannel(channel_id: string): Promise<void> {
+        // If this already exists ignore request.
+        let exists: any;
+        try {
+                exists = await this.connection.models.RegisteredChannels.findOne({ where: { channel_id }, paranoid: false });
+                if (exists && exists.dataValues && exists.dataValues.deletedAt) {
+                    // Restore instead of create.
+                    await exists.restore();
+                    return;
+                }
+        } catch (err) {
+            console.error(err)
+            throw new Error("Internal Database Error.");
+        }
+        if (exists) {
+            throw new Error("Channel already registered.");
+        }
+        try {
+            await this.connection.models.RegisteredChannels.create({ channel_id });
+        } catch (err) {
+            console.error(err);
+            throw new Error("Internal Database Error.");
+	    }
     }
 
     /**
      * Unregister channel from db if channel exists.
      * @param channel_id
      */
-    public async unregisterChannel(channelID: string): Promise<string> {
-        return new Promise<string>((resolve, reject) => {
-            // If this channel does not exist ignore.
-            const targetIndex: number = this.registeredChannels.indexOf(channelID);
-            if (targetIndex === -1) {
-                reject(new Error("not already registered"));
-            }
-            this.registeredChannels.splice(targetIndex, 1);
-            this.connection.run(`DELETE FROM RegisteredChannels WHERE channel_id = ${channelID}`
-            + ` AND EXISTS(SELECT 1 FROM RegisteredChannels WHERE channel_id = ${channelID})`);
-            resolve("Gucci Mane");
-        });
-    }
-
-    /**
-     * Run a query on database.
-     * @param query SQL query to be "executed".
-     */
-    public async queryDB(query: string): Promise<void> {
-        if (this.connection == undefined) {
-            console.error("Database connection closed.");
+    public async unregisterChannel(channel_id: string): Promise<void> {
+        let exists;
+        try {
+            exists = await this.connection.models.RegisteredChannels.findOne({ where: { channel_id } });
+        } catch (err) {
+            throw new Error("Internal Database Error.");
         }
-        this.connection.get(query)
-        .then((rows) => {
-            console.log(rows);
-        })
-        .catch((error) => {
-            console.error(`Unable to read from database, check it exists. ${error}`);
-        });
+        if (!exists) {
+            throw new Error("Channel is not registered.");
+        }
+        try {
+            await this.connection.models.RegisteredChannels.destroy({ where: { channel_id } });
+        } catch (err) {
+            console.error(err);
+            throw new Error("Internal Database Error.");
+	    }
     }
 
     /**
      * Given a two dimensional array of strings with tweet_id, query and text,
-     * import data into database.
+     * load data into database.
      */
-    public storeTweets(data: ITweetData[]): void {
-        const statement = this.connection.prepare("INSERT INTO Trends (tweet_id, hashtag, text) VALUES(?, ?, ?);");
-        data.forEach((tweet) => {
-            statement.then((s) => {
-                s.run(tweet.id, tweet.query, tweet.text)
-                .catch((err) => {
-                    // Do nothing
+    public async storeTweets(data: TweetData[]): Promise<void> {
+        for (let i = 0; i < data.length; i++) {
+            try {
+                // Is this tweet already stored?
+                const exists = await this.connection.models.Trends.count({
+                    where: {
+                        tweet_id: data[i].id
+                    }
                 });
-            })
-            .catch((err) => {
-                // Do nothing
-            });
-        });
-        console.log("Finished material gathering job.");
+                if (exists) {
+                    continue;
+                }
+                // Store this tweet.
+                await this.connection.models.Trends.findOrCreate({
+                    where: {
+                        tweet_id: data[i].id,
+                        hashtag: data[i].query,
+                        body: data[i].text.substr(0, 200)
+                    }
+                });
+            } catch (err) {
+                console.error("Tweet already exists", err);
+            }
+        }
     }
 
     /**
-     * Given a two dimensional array of strings with tweet_id, query and text,
-     * import data into database.
+     * Fetch the body of all stored tweets.
      */
     public async retrieveTweets(): Promise<string[]> {
-        const raw: string[] = [];
-        const data = await this.connection.all("SELECT text FROM Trends;");
-        for (const obj of data) {
-            raw.push(obj.text);
+        let raw: any;
+        try {
+            raw = await this.connection.models.Trends.findAll({
+                attributes: ["body"]
+            });
+        } catch (err) {
+            console.error(err);
         }
-        return raw;
+        const clean = raw.map((row: any) => {
+            return row.dataValues.body;
+        });
+        return clean;
     }
 
     /**
      * Forget all stored tweets.
      */
-    public forgetTweets(): void {
-        const statement = this.connection.prepare("DELETE FROM Trends");
-        statement.then((s) => {
-            s.run()
-            .catch((err) => {
-                console.error(`Error deleting trends: ${err}`);
+    public async forgetTweets(): Promise<void> {
+        try {
+            await this.connection.models.Trends.destroy({
+                where: {},
+                truncate: true
             });
-        })
-        .catch((err) => {
-            console.error(`Error deleting trends: ${err}`);
-        });
+        } catch (err) {
+            console.error(err);
+        }
     }
 
 }

@@ -1,6 +1,6 @@
 import TwitterClient, { ResponseData } from "twitter";
 
-import { ITweetData } from "../../types/ITweetData";
+import { TweetData } from "../../types/TweetData";
 
 /**
  * @classdesc A wrapper class around TwitterClient providing custom functionality.
@@ -42,8 +42,8 @@ export default class TwitterCore {
      * @param TwitterClient.ResponseData.statuses tweet to parse.
      * @returns json
      */
-    public parseTweet(rawTweet: any, query: string): ITweetData {
-        const tweet: ITweetData = {
+    public parseTweet(rawTweet: any, query: string): TweetData {
+        const tweet: TweetData = {
             url: `https://twitter.com/user/status/${rawTweet.id_str}`,
             text: rawTweet.full_text,
             query,
@@ -70,7 +70,7 @@ export default class TwitterCore {
      * @param object params
      * @param cb callback that returns the tweet in string form
      */
-    public async getRandomTweet(query: string): Promise<ITweetData> {
+    public async getRandomTweet(query: string): Promise<TweetData> {
         // Parameters for query
         const params = {
             q: query,
@@ -80,7 +80,7 @@ export default class TwitterCore {
             include_entities: "true",
             tweet_mode: "extended",
         };
-        return new Promise<ITweetData> ((resolve, reject) => {
+        return new Promise<TweetData> ((resolve, reject) => {
             this.getTweets(params)
             .then((data) => {
                 const randomIndex = Math.floor(Math.random() * (data.statuses.length - 1));
@@ -97,7 +97,7 @@ export default class TwitterCore {
      * Get tweets from twitter given a provided hashtag.
      * @returns array of tweets and the query used to find them.
      */
-    public async getMaterialByTweet(queries: string[]): Promise<ITweetData[]> {
+    public async getMaterialByTweet(queries: string[]): Promise<TweetData[]> {
         const parmams = {
             q: "",
             result_type: "mixed",
@@ -106,7 +106,7 @@ export default class TwitterCore {
             include_entities: "true",
             tweet_mode: "extended",
         };
-        const tweets: ITweetData[] = [];
+        const tweets: TweetData[] = [];
         for (const tag of queries) {
             parmams.q = tag;
             const data = await this.getTweets(parmams);
@@ -114,7 +114,7 @@ export default class TwitterCore {
                 tweets.push(this.parseTweet(tweet, data.search_metadata.query));
             }
         }
-        return new Promise<ITweetData[]>((resolve, reject) => {
+        return new Promise<TweetData[]>((resolve, reject) => {
             resolve(tweets);
         });
     }
