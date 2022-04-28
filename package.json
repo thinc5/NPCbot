@@ -22,7 +22,7 @@
     "@types/node": "^10.17.26",
     "@types/sequelize": "^4.28.9",
     "@types/twitter": "^1.7.0",
-    "async": "^2.6.3",
+    "async": "^2.6.4",
     "callback": "0.0.1",
     "cron": "^1.8.2",
     "discord.js": "^11.6.4",
